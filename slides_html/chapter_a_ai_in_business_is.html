@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chapter A: AI in Business Information Systems</title>
+  <link rel="stylesheet" href="shared/deck.css">
+</head>
+<body>
+  <section class="slide title-slide">
+    <div class="content">
+      <div class="course-kicker">DOTE 2051 Business Information Systems</div>
+      <h1 class="lecture-title">Lecture 8: AI in Business Information Systems</h1>
+      <div class="instructor">Instructor: Wanxue (Wendy) Dong</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Why Are We Updating This Topic?</h1>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>AI has moved from a research topic to a daily business tool.</li>
+            <li>Modern information systems now include natural language interfaces.</li>
+            <li>Students need to understand AI as part of people, process, data, and technology.</li>
+          </ul>
+          <div class="callout" style="margin-top: 22px;">
+            The goal is not hype. The goal is to understand where AI fits inside business systems.
+          </div>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/a01_ai_enabled_is_overview.png" alt="AI enabled information system overview">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Learning Objectives</h1>
+      <div class="number-list">
+        <div class="number-row"><div class="number">1</div><p>Explain how AI changes the role of information systems in organizations.</p></div>
+        <div class="number-row"><div class="number">2</div><p>Distinguish traditional AI, machine learning, generative AI, and agentic AI at a beginner level.</p></div>
+        <div class="number-row"><div class="number">3</div><p>Describe how LLMs use prompts, context, and tools in business workflows.</p></div>
+        <div class="number-row"><div class="number">4</div><p>Identify common strengths and limitations of AI systems.</p></div>
+        <div class="number-row"><div class="number">5</div><p>Apply a simple human-in-the-loop pattern for using AI tools responsibly.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Recall: What Is an Information System?</h1>
+      <div class="grid-2">
+        <div class="is-diagram">
+          <div class="is-node people">People</div>
+          <div class="is-node process">Process</div>
+          <div class="is-node data">Data</div>
+          <div class="is-node tech">Technology</div>
+          <div class="is-node structure">Structure</div>
+          <div class="is-center">Information<br>System</div>
+        </div>
+        <div>
+          <p>An information system is a set of interrelated components that work together to support business operations, reporting, analysis, decisions, and coordination.</p>
+          <ul>
+            <li>Technology matters, but it is only one part.</li>
+            <li>Good systems also depend on process design and human judgment.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>AI-Enabled Information Systems</h1>
+      <div class="grid-2">
+        <div class="is-diagram">
+          <div class="ai-layer">AI support layer</div>
+          <div class="is-node people">People</div>
+          <div class="is-node process">Process</div>
+          <div class="is-node data">Data</div>
+          <div class="is-node tech">Technology</div>
+          <div class="is-center">Business<br>Workflow</div>
+        </div>
+        <div>
+          <ul>
+            <li>AI can support communication, analysis, coordination, and decisions.</li>
+            <li>AI does not remove the need for system design.</li>
+            <li>The most important question is: where does AI improve the workflow?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>From Data to Decisions</h1>
+      <div class="flow" style="margin-top: 60px;">
+        <div class="flow-box blue">Data<br><span class="muted">raw records</span></div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box green">Information<br><span class="muted">organized facts</span></div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Insight<br><span class="muted">business meaning</span></div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box">Action<br><span class="muted">decision or process change</span></div>
+      </div>
+      <div class="callout" style="margin-top: 42px;">
+        AI can help at each step, but the organization is still responsible for the decision.
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Changed in the AI Era?</h1>
+      <div class="grid-4">
+        <div class="card">
+          <h2>Natural language</h2>
+          <p>Users can ask systems questions in ordinary language.</p>
+        </div>
+        <div class="card">
+          <h2>Automation</h2>
+          <p>Systems can draft, summarize, classify, and suggest next steps.</p>
+        </div>
+        <div class="card">
+          <h2>Scale</h2>
+          <p>Large volumes of text, code, and documents can be processed faster.</p>
+        </div>
+        <div class="card">
+          <h2>Personalization</h2>
+          <p>Interfaces and recommendations can adapt to different users.</p>
+        </div>
+      </div>
+      <div class="callout" style="margin-top: 40px;">
+        These are information-system changes, not just algorithm changes.
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>A Simple AI Vocabulary Map</h1>
+      <div class="vocab-map">
+        <div class="vocab-ladder">
+          <div class="vocab-step ai">Artificial Intelligence <span>broad field of intelligent systems</span></div>
+          <div class="vocab-step ml">Machine Learning <span>systems learn patterns from data</span></div>
+          <div class="vocab-step dl">Deep Learning <span>large neural network methods</span></div>
+          <div class="vocab-step genai">Generative AI <span>creates new draft outputs</span></div>
+          <div class="vocab-step llm">LLM <span>language-focused generative model</span></div>
+          <div class="vocab-step agent">Agent <span>LLM plus tools and workflow</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Traditional AI</h1>
+      <div class="grid-4">
+        <div class="card"><h2>Prediction</h2><p>Estimate a future outcome, such as demand or churn.</p></div>
+        <div class="card"><h2>Classification</h2><p>Assign an item to a category, such as fraud or not fraud.</p></div>
+        <div class="card"><h2>Clustering</h2><p>Find groups, such as customer segments.</p></div>
+        <div class="card"><h2>Optimization</h2><p>Choose a better allocation, schedule, or route.</p></div>
+      </div>
+      <p style="margin-top: 36px;">Traditional AI is often focused on one specific task with a clearly defined input and output.</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Machine Learning in One Picture</h1>
+      <div class="flow" style="margin-top: 44px;">
+        <div class="flow-box blue">Training data</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box green">Model learns patterns</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Prediction</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box">Evaluation</div>
+      </div>
+      <div class="grid-2 top" style="margin-top: 46px;">
+        <div class="card">
+          <h2>Example</h2>
+          <p>Use past customer data to estimate whether a customer may leave.</p>
+        </div>
+        <div class="card">
+          <h2>Important habit</h2>
+          <p>Check whether the model works on data it did not simply memorize.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Supervised vs Unsupervised Learning</h1>
+      <table class="table" style="margin-top: 18px;">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Beginner idea</th>
+            <th>Business example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Supervised learning</strong></td>
+            <td>The data includes an outcome label.</td>
+            <td>Predict churn using past customers labeled as stayed or left.</td>
+          </tr>
+          <tr>
+            <td><strong>Unsupervised learning</strong></td>
+            <td>The system looks for patterns without a target label.</td>
+            <td>Find customer segments from purchase behavior.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="callout" style="margin-top: 34px;">
+        For this course, focus on what business question the method answers.
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Generative AI</h1>
+      <div class="grid-2">
+        <div>
+          <p>Generative AI creates draft outputs such as:</p>
+          <ul>
+            <li>text and summaries</li>
+            <li>code and explanations</li>
+            <li>charts and analysis plans</li>
+            <li>images, messages, and alternatives</li>
+          </ul>
+          <div class="callout warning" style="margin-top: 20px;">
+            A generated draft is not automatically true.
+          </div>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/a03_genai_outputs.png" alt="Generative AI output panels">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Is an LLM?</h1>
+      <div class="grid-2">
+        <div>
+          <p>A large language model works with language patterns and context.</p>
+          <ul>
+            <li>It receives text input.</li>
+            <li>It predicts and generates likely text output.</li>
+            <li>It can help with drafting, explaining, coding, and summarizing.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Plain English version</h2>
+          <p>An LLM is a language-based engine for producing useful drafts from instructions and context.</p>
+        </div>
+      </div>
+      <div class="callout" style="margin-top: 28px;">
+        It is powerful, but it does not automatically know what is true, private, current, or appropriate for your decision.
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Prompt, Context, and Output</h1>
+      <div class="flow" style="margin-top: 46px;">
+        <div class="flow-box blue">Prompt<br><span class="muted">what you ask</span></div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box green">Context<br><span class="muted">what it can use</span></div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Output<br><span class="muted">the draft result</span></div>
+      </div>
+      <table class="table" style="margin-top: 38px;">
+        <tbody>
+          <tr>
+            <td><strong>Better context</strong></td>
+            <td>Course dataset, business question, constraints, evidence.</td>
+          </tr>
+          <tr>
+            <td><strong>Better output</strong></td>
+            <td>More relevant draft that still needs checking.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Agentic AI</h1>
+      <div class="grid-2">
+        <div>
+          <p>An agentic AI system can use tools and take multi-step actions toward a goal.</p>
+          <ul>
+            <li>read files</li>
+            <li>write or edit code</li>
+            <li>run commands</li>
+            <li>inspect results and suggest fixes</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/a04_agent_tool_workflow.png" alt="Agent connected to tools">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Agents Are Not Autonomous Employees</h1>
+      <div class="grid-2">
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/a02_human_ai_collaboration.png" alt="Human analyst reviewing AI suggestions">
+        </div>
+        <div>
+          <ul>
+            <li>Agents need a clear goal.</li>
+            <li>Agents need constraints and relevant context.</li>
+            <li>Agents need human review before results become decisions.</li>
+          </ul>
+          <div class="callout" style="margin-top: 22px;">
+            Think of the agent as a fast draft partner, not the owner of accountability.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What AI Is Good At</h1>
+      <div class="grid-3">
+        <div class="card"><h2>Summarization</h2><p>Turn long material into a first-pass brief.</p></div>
+        <div class="card"><h2>Pattern spotting</h2><p>Suggest relationships to investigate.</p></div>
+        <div class="card"><h2>Drafting</h2><p>Produce a starting version of messages, plans, and reports.</p></div>
+        <div class="card"><h2>Code assistance</h2><p>Help write, explain, and debug beginner code.</p></div>
+        <div class="card"><h2>First-pass analysis</h2><p>Propose tables, charts, and business questions.</p></div>
+        <div class="card"><h2>Translation of intent</h2><p>Move from natural language to structured actions.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What AI Struggles With</h1>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>Factual reliability</li>
+            <li>Hidden assumptions</li>
+            <li>Current facts and changing policies</li>
+            <li>Private or sensitive data handling</li>
+            <li>Accountability for final decisions</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/a05_ai_limitations_warning.png" alt="AI result checked against evidence">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Business Example: Customer Support</h1>
+      <div class="flow" style="margin-top: 42px;">
+        <div class="flow-box blue">Customer request</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box green">AI triage</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Knowledge base search</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box">Human escalation</div>
+      </div>
+      <div class="grid-2 top" style="margin-top: 44px;">
+        <div class="card"><h2>Useful when</h2><p>Requests are repetitive and rules are documented.</p></div>
+        <div class="card"><h2>Risk to check</h2><p>The system may give an answer that sounds confident but violates policy.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Business Example: Data Analysis</h1>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>Analyst asks business questions.</li>
+            <li>Agent drafts code and charts.</li>
+            <li>Analyst verifies the numbers.</li>
+            <li>Manager receives evidence-based recommendations.</li>
+          </ul>
+          <div class="callout" style="margin-top: 22px;">
+            This is the main workflow for Chapter B.
+          </div>
+        </div>
+        <div class="flow vertical">
+          <div class="flow-box blue">Question</div>
+          <div class="flow-box green">Notebook analysis</div>
+          <div class="flow-box orange">Verified chart</div>
+          <div class="flow-box">Recommendation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Business Example: Marketing</h1>
+      <div class="grid-2">
+        <div class="flow vertical">
+          <div class="flow-box blue">Customer segments</div>
+          <div class="flow-box green">Campaign ideas</div>
+          <div class="flow-box orange">Message variants</div>
+          <div class="flow-box">Performance review</div>
+        </div>
+        <div>
+          <ul>
+            <li>AI can draft copy and suggest target groups.</li>
+            <li>Business strategy still sets the objective.</li>
+            <li>Performance data should decide what actually worked.</li>
+          </ul>
+          <div class="callout warning" style="margin-top: 22px;">
+            AI can create options. It cannot replace customer understanding.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Business Example: Operations</h1>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>Forecast demand or workload.</li>
+            <li>Detect exceptions in a process.</li>
+            <li>Suggest process improvements.</li>
+            <li>Automate routine follow-up steps.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/a06_business_ai_examples.png" alt="Business AI examples">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>A Simple Prompting Pattern</h1>
+      <div class="flow" style="margin-top: 46px;">
+        <div class="flow-box blue">Inspect</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box">Plan</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box green">Execute</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Verify</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box">Summarize</div>
+      </div>
+      <div class="callout" style="margin-top: 42px;">
+        This pattern keeps the human in control of the workflow and makes mistakes easier to catch.
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Example Prompt for Data Work</h1>
+      <div class="prompt-box">Inspect this dataset first. Do not write code yet.
+
+Tell me:
+1. what each column appears to mean,
+2. what data quality issues I should check,
+3. which business questions are reasonable,
+4. what analysis plan you recommend.
+
+Wait for my confirmation before generating code.</div>
+      <div class="grid-3" style="margin-top: 22px;">
+        <div class="card"><h2>Inspect first</h2><p>Avoid rushing into code.</p></div>
+        <div class="card"><h2>Plan first</h2><p>Align with the business question.</p></div>
+        <div class="card"><h2>Confirm first</h2><p>Keep the human responsible.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Classroom Rule for AI Tools</h1>
+      <div class="grid-2 top">
+        <div class="card">
+          <h2>Use</h2>
+          <ul>
+            <li>public data</li>
+            <li>course-provided datasets</li>
+            <li>your own non-sensitive examples</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Do not paste</h2>
+          <ul>
+            <li>student records</li>
+            <li>customer or employee data</li>
+            <li>passwords, keys, or private documents</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout warning" style="margin-top: 36px;">
+        If you are unsure whether data is safe to upload, stop and ask first.
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content big-question">
+      <h1>Where could AI improve a business process you know, and what could go wrong?</h1>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Key Takeaways</h1>
+      <div class="grid-3" style="margin-top: 30px;">
+        <div class="takeaway">
+          <h2>AI is an IS capability</h2>
+          <p>It belongs inside people, process, data, and technology.</p>
+        </div>
+        <div class="takeaway">
+          <h2>Agents need supervision</h2>
+          <p>They can use tools, but they do not own business judgment.</p>
+        </div>
+        <div class="takeaway">
+          <h2>Verification matters</h2>
+          <p>Generated output should be checked against evidence.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Transition to the Next Lecture</h1>
+      <div class="grid-2">
+        <div>
+          <p>Next, we will use Cursor to complete a business data analysis workflow.</p>
+          <ul>
+            <li>load a real course dataset</li>
+            <li>ask an agent to inspect and plan</li>
+            <li>generate notebook code</li>
+            <li>verify charts and recommendations</li>
+          </ul>
+        </div>
+        <div class="flow vertical">
+          <div class="flow-box blue">Business question</div>
+          <div class="flow-box green">AI-assisted notebook</div>
+          <div class="flow-box orange">Verified charts</div>
+          <div class="flow-box">Business recommendation</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const footerText = "DOTE 2051 Business Information Systems ";
+    document.querySelectorAll(".slide").forEach((slide, index) => {
+      const mark = document.createElement("div");
+      mark.className = "bnbu-mark";
+      mark.setAttribute("aria-label", "BNBU");
+      mark.textContent = "BNBU";
+      slide.appendChild(mark);
+
+      const footer = document.createElement("div");
+      footer.className = "footer";
+      footer.textContent = footerText;
+      slide.appendChild(footer);
+
+      const number = document.createElement("div");
+      number.className = "slide-number";
+      number.textContent = `${index + 1} / 28`;
+      slide.appendChild(number);
+    });
+  </script>
+</body>
+</html>

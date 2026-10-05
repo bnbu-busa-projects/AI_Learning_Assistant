@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sample Dense Cheat Sheet</title>
+  <style>
+    @page { size: A4; margin: 8mm; }
+    * { box-sizing: border-box; }
+    body {
+      color: #181713;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 9px;
+      line-height: 1.24;
+      margin: 0;
+    }
+    main {
+      column-count: 4;
+      column-gap: 7mm;
+    }
+    section {
+      break-inside: avoid;
+      border-top: 1px solid #8b806c;
+      margin: 0 0 6px;
+      padding-top: 4px;
+    }
+    h1 {
+      column-span: all;
+      font-size: 16px;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid #b96f42;
+    }
+    h2 {
+      font-size: 10px;
+      margin: 0 0 3px;
+      color: #72442a;
+    }
+    p, ul { margin: 0 0 4px; }
+    ul { padding-left: 12px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8px;
+      margin: 3px 0 5px;
+      break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #d7cbb7;
+      padding: 2px;
+      text-align: left;
+    }
+    .formula {
+      background: #f7f3ea;
+      border-left: 3px solid #b96f42;
+      font-family: "Times New Roman", serif;
+      padding: 3px;
+      margin: 3px 0 5px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Information Systems Cheat Sheet</h1>
+    <section>
+      <h2>Data Quality</h2>
+      <p>Accuracy, completeness, timeliness, consistency, and lineage determine whether analytics outputs are trustworthy.</p>
+      <table><tr><th>Risk</th><th>Response</th></tr><tr><td>Missing values</td><td>Impute, flag, or collect again</td></tr></table>
+    </section>
+    <section>
+      <h2>Cloud Models</h2>
+      <ul><li>IaaS exposes compute and storage.</li><li>PaaS exposes managed runtime services.</li><li>SaaS exposes finished applications.</li></ul>
+    </section>
+    <section>
+      <h2>Queueing</h2>
+      <p>Little's law links throughput, queue length, and cycle time.</p>
+      <div class="formula">L = λW</div>
+    </section>
+    <section>
+      <h2>API Governance</h2>
+      <p>Version contracts, validate inputs, log sanitized failures, and rotate secrets.</p>
+    </section>
+    <section>
+      <h2>Model Evaluation</h2>
+      <table><tr><th>Metric</th><th>Use</th></tr><tr><td>Precision</td><td>Limit false positives</td></tr><tr><td>Recall</td><td>Limit false negatives</td></tr></table>
+    </section>
+    <section>
+      <h2>Security</h2>
+      <p>Least privilege, audit trails, encryption boundaries, and incident response plans reduce operational exposure.</p>
+    </section>
+  </main>
+</body>
+</html>

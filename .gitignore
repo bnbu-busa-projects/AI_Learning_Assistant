@@ -1,0 +1,47 @@
+# Local environment variables and credentials
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+Qwen_API
+**/Qwen_API
+data/model-secrets.env
+**/model-secrets.env
+
+# Local databases, uploaded files, generated runs, and reports
+data/
+workspace/
+local-ui-check.txt
+ecs-docker-check.txt
+ecs-web-service-test.txt
+
+# Python virtual environments, bytecode, and test/tool caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node dependencies and generated build output
+node_modules/
+dist/
+build/
+.vite/
+
+# Private keys and local certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,155 @@
+import json
+from pathlib import Path
+
+from backend.core.runs import create_run, make_run_executor
+from backend.pipelines.html_to_pdf import SLIDES_PAGE
+from backend.providers.base import ModelProviderError
+
+
+SLIDES_HTML = """```html
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page { size: 10in 5.625in; margin: 0; }
+    .slide { width: 960px; height: 540px; page-break-after: always; }
+  </style>
+</head>
+<body>
+  <section class="slide title-slide"><div class="content"><h1>Sample Lecture</h1></div></section>
+  <section class="slide"><div class="content"><h2>Key Idea</h2><p>A concise slide.</p></div></section>
+</body>
+</html>
+```"""
+
+
+def test_slides_html_pipeline_writes_source_and_converted_pdf(
+    tmp_path,
+    repo_with_user,
+    fake_model_provider_factory,
+    mock_pdf_converter,
+    noop_search_adapter,
+):
+    repo, user = repo_with_user
+    provider = fake_model_provider_factory(SLIDES_HTML)
+
+    body = create_run(
+        repo,
+        current_user=user,
+        request={
+            "task_text": "Create a short lecture deck.",
+            "intent": "beamer_slides",
+            "search_mode": "off",
+        },
+        workspace_root=str(tmp_path / "workspace"),
+        executor=make_run_executor(provider, pdf_converter=mock_pdf_converter),
+        search_adapter=noop_search_adapter,
+    )
+
+    assert body["status"] == "succeeded"
+    output_root = Path(body["output_root"])
+    source = (output_root / "output" / "slides.html").read_text(encoding="utf-8")
+    assert source.startswith("<!doctype html>")
+    assert '<section class="slide title-slide">' in source
+    assert (output_root / "output" / "slides.pdf").read_bytes().startswith(b"%PDF")
+    assert (output_root / "logs" / "convert.log").read_text(encoding="utf-8") == (
+        "mock convert OK\n"
+    )
+    assert mock_pdf_converter.calls[0]["html_path"] == output_root / "output" / "slides.html"
+    assert mock_pdf_converter.calls[0]["pdf_path"] == output_root / "output" / "slides.pdf"
+    assert mock_pdf_converter.calls[0]["page_config"] == SLIDES_PAGE
+    assert "deck.css vocabulary" in provider.requests[0].user_prompt
+    assert "960px" in provider.requests[0].user_prompt
+    assert "10in 5.625in" in provider.requests[0].user_prompt
+
+    manifest = json.loads((output_root / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["intent"] == "beamer_slides"
+    assert manifest["status"] == "succeeded"
+    assert {"path": "output/slides.html", "kind": "source"} in manifest["outputs"]
+    assert {"path": "output/slides.pdf", "kind": "pdf"} in manifest["outputs"]
+
+    artifact_kinds = {row["kind"] for row in repo.list_artifacts_for_run(body["id"])}
+    assert {"source", "pdf", "log", "manifest"}.issubset(artifact_kinds)
+
+
+def test_slides_html_pipeline_conversion_failure_preserves_source_log_and_manifest(
+    tmp_path,
+    repo_with_user,
+    fake_model_provider_factory,
+    failing_pdf_converter,
+    noop_search_adapter,
+):
+    repo, user = repo_with_user
+    provider = fake_model_provider_factory(SLIDES_HTML)
+
+    body = create_run(
+        repo,
+        current_user=user,
+        request={
+            "task_text": "Create a deck with a conversion failure.",
+            "intent": "beamer_slides",
+            "search_mode": "off",
+        },
+        workspace_root=str(tmp_path / "workspace"),
+        executor=make_run_executor(provider, pdf_converter=failing_pdf_converter),
+        search_adapter=noop_search_adapter,
+    )
+
+    assert body["status"] == "failed"
+    assert body["error_message"] == "convert_failed: Mock conversion failure"
+    output_root = Path(body["output_root"])
+    assert (output_root / "output" / "slides.html").exists()
+    assert not (output_root / "output" / "slides.pdf").exists()
+    assert (output_root / "logs" / "convert.log").read_text(encoding="utf-8") == (
+        "mock error log\n"
+    )
+
+    manifest = json.loads((output_root / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["intent"] == "beamer_slides"
+    assert manifest["status"] == "failed"
+    assert {"path": "output/slides.html", "kind": "source"} in manifest["outputs"]
+    assert {"path": "output/slides.pdf", "kind": "pdf"} not in manifest["outputs"]
+
+    generation_log = (output_root / "logs" / "generation.log").read_text(
+        encoding="utf-8"
+    )
+    assert "convert_failed" in generation_log
+    assert "Traceback" not in generation_log
+
+
+def test_slides_html_pipeline_model_provider_failure_preserves_log_and_manifest(
+    tmp_path,
+    repo_with_user,
+    fake_model_provider_factory,
+    mock_pdf_converter,
+    noop_search_adapter,
+):
+    repo, user = repo_with_user
+    provider = fake_model_provider_factory(
+        error=ModelProviderError("provider_unavailable", "Provider is offline.")
+    )
+
+    body = create_run(
+        repo,
+        current_user=user,
+        request={
+            "task_text": "Create a deck while provider is unavailable.",
+            "intent": "beamer_slides",
+            "search_mode": "off",
+        },
+        workspace_root=str(tmp_path / "workspace"),
+        executor=make_run_executor(provider, pdf_converter=mock_pdf_converter),
+        search_adapter=noop_search_adapter,
+    )
+
+    assert body["status"] == "failed"
+    assert body["error_message"] == "provider_unavailable: Provider is offline."
+    output_root = Path(body["output_root"])
+    assert not (output_root / "output" / "slides.html").exists()
+    assert not mock_pdf_converter.calls
+
+    manifest = json.loads((output_root / "manifest.json").read_text(encoding="utf-8"))
+    assert manifest["intent"] == "beamer_slides"
+    assert manifest["status"] == "failed"
+    assert manifest["outputs"] == []

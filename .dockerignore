@@ -1,0 +1,20 @@
+# Keep credentials, local state, and development dependencies out of the image.
+.git
+.env
+.env.*
+**/.env
+**/.env.*
+Qwen_API
+**/model-secrets.env
+data/
+workspace/
+**/node_modules
+**/.venv
+**/venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+backend/tests/
+ecs-docker-check.txt
+ecs-web-service-test.txt
+local-ui-check.txt

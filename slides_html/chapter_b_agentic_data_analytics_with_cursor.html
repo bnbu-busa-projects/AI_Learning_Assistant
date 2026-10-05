@@ -1,0 +1,951 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chapter B: Agentic Data Analytics with Cursor</title>
+  <link rel="stylesheet" href="shared/deck.css">
+</head>
+<body>
+  <section class="slide title-slide">
+    <div class="content">
+      <div class="course-kicker">DOTE 2051 Business Information Systems</div>
+      <h1 class="lecture-title">Lecture 9: Agentic Data Analytics with Cursor</h1>
+      <div class="instructor">Instructor: Wanxue (Wendy) Dong</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Why Replace an Excel Workflow?</h1>
+      <div class="grid-2 top">
+        <div class="card">
+          <h2>Excel foundation</h2>
+          <ul>
+            <li>tables</li>
+            <li>calculated fields</li>
+            <li>filters and PivotTables</li>
+            <li>charts and reports</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Modern workflow</h2>
+          <ul>
+            <li>notebooks</li>
+            <li>code and reproducibility</li>
+            <li>AI assistants</li>
+            <li>larger data and APIs</li>
+          </ul>
+        </div>
+      </div>
+      <div class="image-panel" style="margin-top: 24px;">
+        <img class="visual-img" style="max-height: 155px;" src="../slide_assets/generated/b02_excel_to_notebook_transition.png" alt="Spreadsheet to notebook workflow">
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Learning Objectives</h1>
+      <div class="number-list">
+        <div class="number-row"><div class="number">1</div><p>Explain how agentic tools can support a business data analysis workflow.</p></div>
+        <div class="number-row"><div class="number">2</div><p>Use Cursor to inspect a dataset, propose an analysis plan, write notebook code, and debug errors.</p></div>
+        <div class="number-row"><div class="number">3</div><p>Recreate Excel-style tasks in Python: cleaning, derived fields, grouping, summary tables, and charts.</p></div>
+        <div class="number-row"><div class="number">4</div><p>Verify AI-generated code and analysis using simple quality checks.</p></div>
+        <div class="number-row"><div class="number">5</div><p>Produce a short business recommendation from data analysis.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Recall: Original Data Analysis Workflow</h1>
+      <div class="flow" style="margin-top: 38px;">
+        <div class="flow-box blue">Design table</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Clean</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Lookup</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Calculate</div>
+      </div>
+      <div class="flow" style="margin-top: 18px;">
+        <div class="flow-box">Filter</div><div class="arrow">&rarr;</div>
+        <div class="flow-box blue">Summarize</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Visualize</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Recommend</div>
+      </div>
+      <div class="callout" style="margin-top: 28px;">The business logic stays familiar. The toolchain changes.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Modern Version of the Same Workflow</h1>
+      <div class="flow" style="margin-top: 38px;">
+        <div class="flow-box blue">Inspect</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Clean</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Engineer features</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Group</div>
+      </div>
+      <div class="flow" style="margin-top: 18px;">
+        <div class="flow-box">Visualize</div><div class="arrow">&rarr;</div>
+        <div class="flow-box blue">Interpret</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Verify</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Submit</div>
+      </div>
+      <div class="callout" style="margin-top: 28px;">Cursor can help draft each step, but the analyst checks each step.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Is Cursor?</h1>
+      <div class="grid-2">
+        <div>
+          <p>Cursor is an AI coding environment for working with code, notebooks, terminal commands, and project files.</p>
+          <ul>
+            <li>Open a course project folder.</li>
+            <li>Ask the agent to inspect files.</li>
+            <li>Edit notebooks and scripts.</li>
+            <li>Run and debug analysis.</li>
+          </ul>
+        </div>
+        <div class="screenshot-placeholder" data-src="../slide_assets/screenshots/b_cursor_project_view.png">
+          <div><strong>Screenshot placeholder</strong><p>b_cursor_project_view.png</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Is an Agent in This Context?</h1>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>It can read project files.</li>
+            <li>It can suggest an analysis plan.</li>
+            <li>It can edit code and notebook cells.</li>
+            <li>It can run commands and use error messages to debug.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/b01_agentic_analytics_workspace.png" alt="Agentic analytics workspace">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>The Human Analyst Is Still Responsible</h1>
+      <table class="table">
+        <thead><tr><th>Agent drafts</th><th>Analyst verifies</th></tr></thead>
+        <tbody>
+          <tr><td>Suggests a plan</td><td>Checks whether the plan answers the business question</td></tr>
+          <tr><td>Writes code</td><td>Confirms row counts, formulas, and outputs</td></tr>
+          <tr><td>Explains charts</td><td>Checks whether the interpretation matches evidence</td></tr>
+          <tr><td>Debugs errors</td><td>Decides whether the fix is minimal and appropriate</td></tr>
+        </tbody>
+      </table>
+      <div class="callout" style="margin-top: 28px;">The agent accelerates work. It does not own the conclusion.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>In-Class Project</h1>
+      <div class="grid-2">
+        <div>
+          <p>You are a junior analyst for a bank marketing team.</p>
+          <ul>
+            <li>The bank ran phone campaigns.</li>
+            <li>The goal is to understand term deposit subscription.</li>
+            <li>The deliverable is a verified business analysis, not a perfect ML model.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/b03_bank_campaign_business_scene.png" alt="Bank campaign analysis scene">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Dataset Source</h1>
+      <div class="card" style="margin-top: 18px;">
+        <h2>UCI Bank Marketing</h2>
+        <p>Campaign calls from a Portuguese banking institution. The target variable records whether a client subscribed to a term deposit.</p>
+      </div>
+      <table class="table" style="margin-top: 24px;">
+        <tbody>
+          <tr><td><strong>Source</strong></td><td>UCI Machine Learning Repository</td></tr>
+          <tr><td><strong>Citation</strong></td><td>Moro, Rita, and Cortez (2014), Bank Marketing</td></tr>
+          <tr><td><strong>Course use</strong></td><td>Segment analysis, conversion analysis, and business recommendation</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Student File Name</h1>
+      <div class="code-box" style="font-size: 26px; margin-top: 70px;">data/processed/bank_marketing_campaigns.csv</div>
+      <div class="callout" style="margin-top: 42px;">The name is friendly for class. The source remains the original UCI Bank Marketing dataset.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Important Variables</h1>
+      <table class="table small">
+        <thead><tr><th>Variable</th><th>Beginner meaning</th><th>Use carefully because...</th></tr></thead>
+        <tbody>
+          <tr><td>age, job, education</td><td>Customer profile</td><td>Segments need business interpretation</td></tr>
+          <tr><td>balance, loan</td><td>Financial context</td><td>May reflect different customer needs</td></tr>
+          <tr><td>contact, month</td><td>Campaign channel and timing</td><td>Can be affected by campaign design</td></tr>
+          <tr><td>campaign, previous</td><td>Contact intensity and history</td><td>High contact count may be a warning sign</td></tr>
+          <tr><td>y</td><td>Subscribed yes or no</td><td>This is the main outcome for conversion</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Business Questions</h1>
+      <div class="grid-2 top">
+        <ul>
+          <li>What is the overall campaign conversion rate?</li>
+          <li>Which customer segments have higher conversion rates?</li>
+          <li>Which campaign conditions appear associated with better outcomes?</li>
+        </ul>
+        <ul>
+          <li>Which variables are useful for business decisions?</li>
+          <li>Which variables may be misleading?</li>
+          <li>What should the bank do differently next time?</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Project Folder</h1>
+      <div class="project-tree">
+is_course_refresh/<br>
+  data/<br>
+    processed/<br>
+      bank_marketing_campaigns.csv<br>
+  notebooks/<br>
+    01_agentic_data_analytics_bank_marketing.ipynb<br>
+  outputs/<br>
+    chapter_b/
+      </div>
+      <div class="callout" style="margin-top: 24px;">Open the course folder, not just the notebook file. The agent needs project context.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Notebook Deliverable</h1>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>Code cells that run top to bottom.</li>
+            <li>Markdown cells explaining the reasoning.</li>
+            <li>At least two charts.</li>
+            <li>One business recommendation with evidence.</li>
+          </ul>
+        </div>
+        <div class="screenshot-placeholder" data-src="../slide_assets/screenshots/b_notebook_data_inspection.png">
+          <div><strong>Screenshot placeholder</strong><p>b_notebook_data_inspection.png</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Cursor Workflow Step 1</h1>
+      <div class="prompt-box">Ask the agent to inspect first.
+
+Do not ask for a full analysis immediately.
+Do not ask for final charts immediately.
+Do not accept code before you understand the dataset.</div>
+      <div class="callout" style="margin-top: 28px;">The first goal is orientation, not speed.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Good First Prompt</h1>
+      <div class="prompt-box">Inspect the CSV and summarize:
+1. column names and likely meanings,
+2. row and column count,
+3. data types and missing or unknown values,
+4. reasonable business questions,
+5. a short analysis plan.
+
+Do not write analysis code until I confirm the plan.</div>
+      <div class="grid-3" style="margin-top: 18px;">
+        <div class="card"><h2>Scope</h2><p>Start with one dataset.</p></div>
+        <div class="card"><h2>Control</h2><p>Approve the plan before code.</p></div>
+        <div class="card"><h2>Evidence</h2><p>Ask what must be verified.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Checkpoint 1: Data Loaded</h1>
+      <div class="checkpoint">
+        <h2>Before continuing, confirm:</h2>
+        <ul class="checklist">
+          <li>The CSV path is correct.</li>
+          <li>The dataframe has the expected row and column count.</li>
+          <li>The target column <code>y</code> is present.</li>
+          <li>The notebook output matches what the agent described.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Python Notebook Basics</h1>
+      <div class="grid-2 top">
+        <div class="card"><h2>Code cell</h2><p>Runs Python and produces output.</p></div>
+        <div class="card"><h2>Markdown cell</h2><p>Explains what the analysis means.</p></div>
+      </div>
+      <div class="flow" style="margin-top: 38px;">
+        <div class="flow-box blue">Cell order</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Run output</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Interpretation</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Revision</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Import Packages</h1>
+      <div class="code-box">import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+plt.style.use("default")</div>
+      <div class="callout" style="margin-top: 28px;">Keep the package list short. The goal is business analysis, not a library tour.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Load the CSV</h1>
+      <div class="code-box">path = "../data/processed/bank_marketing_campaigns.csv"
+df = pd.read_csv(path)
+
+df.shape
+df.head()</div>
+      <div class="grid-2 top" style="margin-top: 24px;">
+        <div class="card"><h2>Check</h2><p>Does the row count look plausible?</p></div>
+        <div class="card"><h2>Check</h2><p>Do the columns match the data dictionary?</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Inspect the Dataset</h1>
+      <table class="table">
+        <thead><tr><th>Function</th><th>What it tells you</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td><code>head()</code></td><td>First rows</td><td>See the format</td></tr>
+          <tr><td><code>shape</code></td><td>Rows and columns</td><td>Detect unexpected row loss</td></tr>
+          <tr><td><code>info()</code></td><td>Types and missing values</td><td>Catch parsing problems</td></tr>
+          <tr><td><code>describe()</code></td><td>Summary statistics</td><td>Find impossible or unusual values</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Data Quality Questions</h1>
+      <div class="grid-2 top">
+        <ul class="checklist">
+          <li>Are values missing or marked as unknown?</li>
+          <li>Are there duplicate rows?</li>
+          <li>Are categories inconsistent?</li>
+        </ul>
+        <ul class="checklist">
+          <li>Are there impossible values?</li>
+          <li>Did loading change the row count?</li>
+          <li>Do columns match the business story?</li>
+        </ul>
+      </div>
+      <div class="callout" style="margin-top: 34px;">AI-generated summaries are useful only after these checks are performed.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Missing Values</h1>
+      <table class="table">
+        <thead><tr><th>Value pattern</th><th>Possible meaning</th><th>Classroom decision</th></tr></thead>
+        <tbody>
+          <tr><td><code>unknown</code> in job</td><td>Customer category not recorded</td><td>Keep as a category and discuss</td></tr>
+          <tr><td><code>unknown</code> in education</td><td>Education unavailable</td><td>Do not silently drop rows</td></tr>
+          <tr><td>Blank or NaN</td><td>Parsing or missing record</td><td>Count and inspect before deciding</td></tr>
+        </tbody>
+      </table>
+      <div class="callout" style="margin-top: 28px;">Unknown is often information, not just an error.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Duplicates</h1>
+      <div class="grid-2 top">
+        <div class="card">
+          <h2>Duplicate row</h2>
+          <p>The exact same row appears more than once. This may be a data quality issue.</p>
+        </div>
+        <div class="card">
+          <h2>Repeated customer/contact</h2>
+          <p>A real business process may contact similar customers many times.</p>
+        </div>
+      </div>
+      <div class="warning-banner" style="margin-top: 36px;">
+        Do not blindly drop rows just because the word "duplicate" appears in an AI answer.
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Create Friendly Fields</h1>
+      <table class="table">
+        <thead><tr><th>New field</th><th>Example logic</th><th>Business purpose</th></tr></thead>
+        <tbody>
+          <tr><td>subscribed</td><td><code>y == "yes"</code></td><td>Conversion rate</td></tr>
+          <tr><td>age_group</td><td>bins for age ranges</td><td>Segment comparison</td></tr>
+          <tr><td>campaign_intensity</td><td>low, medium, high contacts</td><td>Contact pressure</td></tr>
+          <tr><td>contact_category</td><td>cellular, telephone, unknown</td><td>Channel comparison</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>From Excel Lookup to Python Mapping</h1>
+      <div class="grid-2 top">
+        <div>
+          <div class="compare-label">Excel idea</div>
+          <div class="code-box">XLOOKUP(job, table, group)</div>
+        </div>
+        <div>
+          <div class="compare-label">Python idea</div>
+          <div class="code-box">job_map = {"admin.": "office"}
+df["job_group"] = df["job"].map(job_map)</div>
+        </div>
+      </div>
+      <div class="callout" style="margin-top: 24px;">The skill transfers: turn categories into clearer business groups.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Checkpoint 2: Feature Engineering</h1>
+      <div class="checkpoint">
+        <h2>Before analysis, confirm:</h2>
+        <ul class="checklist">
+          <li>The row count did not change unexpectedly.</li>
+          <li>New fields have clear business meanings.</li>
+          <li>Mappings did not create too many missing values.</li>
+          <li>The target variable still matches the original <code>y</code> column.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Overall Conversion Rate</h1>
+      <div class="kpi-row" style="margin-top: 48px;">
+        <div class="kpi-card"><div class="kpi-label">Customers contacted</div><div class="kpi-value">N</div></div>
+        <div class="kpi-card"><div class="kpi-label">Subscribed</div><div class="kpi-value">Yes</div></div>
+        <div class="kpi-card"><div class="kpi-label">Conversion rate</div><div class="kpi-value">%</div></div>
+      </div>
+      <div class="code-box" style="margin-top: 34px;">conversion_rate = df["subscribed"].mean()</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Segment Analysis</h1>
+      <table class="table">
+        <thead><tr><th>Segment</th><th>Customers</th><th>Subscribed</th><th>Conversion rate</th></tr></thead>
+        <tbody>
+          <tr><td>job</td><td>count</td><td>sum</td><td>mean</td></tr>
+          <tr><td>education</td><td>count</td><td>sum</td><td>mean</td></tr>
+          <tr><td>loan</td><td>count</td><td>sum</td><td>mean</td></tr>
+          <tr><td>contact</td><td>count</td><td>sum</td><td>mean</td></tr>
+        </tbody>
+      </table>
+      <div class="callout" style="margin-top: 28px;">A segment is useful only if it helps the bank decide what to do next.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Groupby Is the New PivotTable</h1>
+      <div class="grid-2 top">
+        <div class="card">
+          <h2>PivotTable</h2>
+          <p>Rows: job<br>Values: count, average conversion<br>Sort: highest conversion</p>
+        </div>
+        <div class="card">
+          <h2>pandas groupby</h2>
+          <div class="code-box" style="font-size: 15px;">df.groupby("job")["subscribed"]
+  .agg(["count", "mean"])
+  .sort_values("mean")</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Visualization 1: Conversion by Job</h1>
+      <div class="grid-2">
+        <div>
+          <p>Use a bar chart for comparing categories.</p>
+          <ul>
+            <li>Sort by conversion rate.</li>
+            <li>Limit to readable categories if needed.</li>
+            <li>Include sample size when interpreting.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="mini-chart">
+            <div class="bar" style="height: 38%;"></div><div class="bar" style="height: 52%;"></div><div class="bar" style="height: 70%;"></div><div class="bar" style="height: 44%;"></div><div class="bar" style="height: 82%;"></div><div class="bar" style="height: 60%;"></div>
+          </div>
+          <div class="axis-note">Placeholder chart until notebook output exists</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Visualization 2: Conversion by Contact Month</h1>
+      <div class="grid-2">
+        <div class="screenshot-placeholder" data-src="../slide_assets/screenshots/b_notebook_conversion_chart.png">
+          <div><strong>Screenshot placeholder</strong><p>b_notebook_conversion_chart.png</p></div>
+        </div>
+        <div>
+          <ul>
+            <li>Month may reflect campaign timing.</li>
+            <li>Do not call it seasonality too quickly.</li>
+            <li>Ask what changed in the campaign design.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Visualization 3: Campaign Intensity</h1>
+      <div class="line-chart">
+        <svg viewBox="0 0 500 220" preserveAspectRatio="none" aria-label="Campaign intensity placeholder line chart">
+          <polyline points="20,60 95,82 170,108 245,128 320,152 395,172 470,184" fill="none" stroke="#2f74d0" stroke-width="5"/>
+          <polyline points="20,90 95,105 170,122 245,148 320,164 395,180 470,193" fill="none" stroke="#d88a19" stroke-width="4" stroke-dasharray="10 8"/>
+        </svg>
+      </div>
+      <div class="callout" style="margin-top: 22px;">More contacts may show diminishing returns. It may also reveal targeting problems.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Visualization Quality Rules</h1>
+      <div class="grid-2 top">
+        <ul class="checklist">
+          <li>Use honest axes.</li>
+          <li>Use readable labels.</li>
+          <li>Use a title that states the question.</li>
+        </ul>
+        <ul class="checklist">
+          <li>Do not hide sample size.</li>
+          <li>Do not overload categories.</li>
+          <li>Do not decorate instead of explaining.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Checkpoint 3: Chart Verification</h1>
+      <div class="checkpoint">
+        <h2>Ask before accepting a chart:</h2>
+        <ul class="checklist">
+          <li>What question does this chart answer?</li>
+          <li>Are the labels readable?</li>
+          <li>Is the calculation correct?</li>
+          <li>Could the chart be misleading?</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>A Critical Analytics Trap</h1>
+      <div class="warning-banner">
+        <h2><code>duration</code> is only known after the call.</h2>
+        <p>If the goal is to decide whom to call before the campaign, then using call duration can leak information from the future.</p>
+      </div>
+      <div class="image-panel" style="margin-top: 26px;">
+        <img class="visual-img" style="max-height: 210px;" src="../slide_assets/generated/b06_data_leakage_timeline.png" alt="Data leakage timeline">
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Data Leakage in Plain English</h1>
+      <div class="flow" style="margin-top: 54px;">
+        <div class="flow-box blue">Before call<br><span class="muted">age, job, balance</span></div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box green">Call happens</div>
+        <div class="arrow">&rarr;</div>
+        <div class="flow-box orange">After call<br><span class="muted">duration, outcome</span></div>
+      </div>
+      <div class="callout warning" style="margin-top: 42px;">A variable may look predictive because it is unavailable at decision time.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>AI Agents Can Miss Business Context</h1>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>The agent may optimize a technical metric.</li>
+            <li>The business decision may require a different metric.</li>
+            <li>The agent may include a leakage variable unless you tell it not to.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/b05_human_verifies_agent_code.png" alt="Human verifies agent code">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Ask Cursor to Explain the Result</h1>
+      <div class="flow" style="margin-top: 54px;">
+        <div class="flow-box blue">Chart</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Draft explanation</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Evidence check</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Business wording</div>
+      </div>
+      <div class="callout" style="margin-top: 42px;">Use AI to draft interpretation, then require it to cite the numbers that support the claim.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>From Chart to Business Insight</h1>
+      <div class="writing-frame">
+        <div class="card"><h2>Observation</h2><p>What changed in the chart?</p></div>
+        <div class="card"><h2>Interpretation</h2><p>What might explain the pattern?</p></div>
+        <div class="card"><h2>Recommendation</h2><p>What should the business do next?</p></div>
+      </div>
+      <div class="callout" style="margin-top: 34px;">A chart is not a conclusion. A conclusion connects evidence to action.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Example Insight</h1>
+      <div class="card" style="margin-top: 34px;">
+        <h2>Careful wording</h2>
+        <p>"Cellular contact shows higher conversion in this dataset, but campaign design may confound the result. The bank should compare channel performance while checking customer segment mix and contact timing."</p>
+      </div>
+      <div class="grid-3" style="margin-top: 28px;">
+        <div class="card"><h2>Observation</h2><p>Cellular is higher.</p></div>
+        <div class="card"><h2>Caution</h2><p>Other factors may differ.</p></div>
+        <div class="card"><h2>Action</h2><p>Investigate before changing policy.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Exporting Outputs</h1>
+      <div class="folder-tree">
+outputs/<br>
+  chapter_b/<br>
+    conversion_by_job.png<br>
+    conversion_by_contact_month.png<br>
+    bank_marketing_summary.csv
+      </div>
+      <div class="callout" style="margin-top: 28px;">Saved outputs make the notebook easier to check and reuse.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Reproducibility</h1>
+      <div class="grid-2 top">
+        <ul class="checklist">
+          <li>The notebook runs from top to bottom.</li>
+          <li>File paths are relative to the project.</li>
+          <li>Randomness is controlled if used.</li>
+        </ul>
+        <ul class="checklist">
+          <li>Charts can be regenerated.</li>
+          <li>Tables match the written interpretation.</li>
+          <li>Markdown explains choices.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Debugging with Cursor</h1>
+      <div class="flow" style="margin-top: 60px;">
+        <div class="flow-box blue">Read error</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Locate line</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Ask for minimal fix</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Rerun</div>
+      </div>
+      <div class="callout" style="margin-top: 44px;">Do not ask the agent to rewrite the whole notebook for a one-line error.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Common Error: Missing Package</h1>
+      <div class="grid-2">
+        <div>
+          <div class="code-box">ModuleNotFoundError:
+No module named 'seaborn'</div>
+          <div class="callout" style="margin-top: 20px;">Install the package in the active environment, then rerun the cell.</div>
+        </div>
+        <div class="screenshot-placeholder" data-src="../slide_assets/screenshots/b_debugging_error_example.png">
+          <div><strong>Screenshot placeholder</strong><p>b_debugging_error_example.png</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Common Error: Wrong File Path</h1>
+      <div class="grid-2 top">
+        <div class="folder-tree">
+notebooks/<br>
+  01_agentic_data_analytics_bank_marketing.ipynb<br>
+data/<br>
+  processed/<br>
+    bank_marketing_campaigns.csv
+        </div>
+        <div>
+          <ul>
+            <li>Check the current working directory.</li>
+            <li>Use a project-relative path.</li>
+            <li>Do not move the CSV without updating code.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Common Error: Plot Too Crowded</h1>
+      <div class="grid-2 top">
+        <div class="card"><h2>Before</h2><p>Every category appears, labels overlap, and the chart is hard to read.</p></div>
+        <div class="card"><h2>After</h2><p>Sort, limit to top categories, rotate labels only when necessary, and explain what was excluded.</p></div>
+      </div>
+      <div class="mini-chart" style="height: 145px; margin-top: 30px;">
+        <div class="bar" style="height: 95%;"></div><div class="bar" style="height: 85%;"></div><div class="bar" style="height: 76%;"></div><div class="bar" style="height: 68%;"></div><div class="bar" style="height: 55%;"></div><div class="bar" style="height: 42%;"></div><div class="bar" style="height: 32%;"></div><div class="bar" style="height: 24%;"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Checkpoint 4: Final Notebook</h1>
+      <div class="checkpoint">
+        <h2>Submission readiness:</h2>
+        <ul class="checklist">
+          <li>Code runs top to bottom.</li>
+          <li>Charts render without manual fixes.</li>
+          <li>Insights cite evidence.</li>
+          <li>Limitations are stated honestly.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Mini Exercise</h1>
+      <div class="exercise-box">
+        <div>
+          <h2>Ask Cursor for one more segment analysis.</h2>
+          <p>Then verify whether the result is correct, useful, and not misleading.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content big-question">
+      <h1>Which result would you trust least? Why?</h1>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Deliverable</h1>
+      <div class="grid-3" style="margin-top: 34px;">
+        <div class="takeaway"><h2>Notebook</h2><p>Runs from top to bottom with clear markdown.</p></div>
+        <div class="takeaway"><h2>Two charts</h2><p>Answer business questions and include readable labels.</p></div>
+        <div class="takeaway"><h2>Recommendation</h2><p>One action supported by evidence and caveats.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Rubric</h1>
+      <table class="table">
+        <thead><tr><th>Criteria</th><th>What strong work shows</th></tr></thead>
+        <tbody>
+          <tr><td>Correctness</td><td>Calculations and row counts are checked.</td></tr>
+          <tr><td>Verification</td><td>Agent output is tested before accepted.</td></tr>
+          <tr><td>Visualization</td><td>Charts are readable and tied to questions.</td></tr>
+          <tr><td>Business reasoning</td><td>Recommendations connect evidence to action.</td></tr>
+          <tr><td>Transparency</td><td>Limitations and AI assistance are documented.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What This Replaces from Excel</h1>
+      <table class="table">
+        <thead><tr><th>Excel task</th><th>Python/Cursor version</th></tr></thead>
+        <tbody>
+          <tr><td>Lookup</td><td>Mapping categories into new fields</td></tr>
+          <tr><td>Calculated fields</td><td>Derived dataframe columns</td></tr>
+          <tr><td>Filters</td><td>Boolean conditions</td></tr>
+          <tr><td>PivotTables</td><td>Groupby summary tables</td></tr>
+          <tr><td>Charts</td><td>Notebook visualizations saved as outputs</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What This Adds</h1>
+      <div class="grid-4">
+        <div class="card"><h2>Agent supervision</h2><p>Prompt, review, verify.</p></div>
+        <div class="card"><h2>Reproducibility</h2><p>Rerun the notebook.</p></div>
+        <div class="card"><h2>Coding workflow</h2><p>Use files, outputs, and versioned steps.</p></div>
+        <div class="card"><h2>Scalable analysis</h2><p>Prepare for APIs and larger data.</p></div>
+      </div>
+      <div class="image-panel" style="margin-top: 28px;">
+        <img class="visual-img" style="max-height: 165px;" src="../slide_assets/generated/b04_data_cleaning_pipeline.png" alt="Data cleaning pipeline">
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Key Takeaways</h1>
+      <div class="grid-3" style="margin-top: 32px;">
+        <div class="takeaway"><h2>AI can accelerate analysis</h2><p>It helps inspect, code, explain, and debug.</p></div>
+        <div class="takeaway"><h2>Humans verify</h2><p>Numbers, charts, and claims still need evidence checks.</p></div>
+        <div class="takeaway"><h2>Business context matters</h2><p>A technically correct answer can still be the wrong decision.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Transition to the Next Lecture</h1>
+      <div class="grid-2">
+        <div>
+          <p>Next: cloud services and APIs behind AI tools.</p>
+          <ul>
+            <li>How software systems communicate.</li>
+            <li>What API keys are.</li>
+            <li>How notebooks can call public APIs.</li>
+            <li>Why security must come after API basics.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/b07_business_recommendation_board.png" alt="Recommendation board">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const footerText = "DOTE 2051 Business Information Systems ";
+    const slides = document.querySelectorAll(".slide");
+    slides.forEach((slide, index) => {
+      slide.id = `slide-${index + 1}`;
+      const mark = document.createElement("div");
+      mark.className = "bnbu-mark";
+      mark.setAttribute("aria-label", "BNBU");
+      mark.textContent = "BNBU";
+      slide.appendChild(mark);
+
+      const footer = document.createElement("div");
+      footer.className = "footer";
+      footer.textContent = footerText;
+      slide.appendChild(footer);
+
+      const number = document.createElement("div");
+      number.className = "slide-number";
+      number.textContent = `${index + 1} / 57`;
+      slide.appendChild(number);
+    });
+
+    const requestedSlide = Number(new URLSearchParams(window.location.search).get("slide"));
+    if (Number.isInteger(requestedSlide) && requestedSlide >= 1 && requestedSlide <= slides.length) {
+      window.addEventListener("load", () => {
+        slides[requestedSlide - 1].scrollIntoView({ block: "start" });
+      });
+    }
+
+    document.querySelectorAll(".screenshot-placeholder[data-src]").forEach((box) => {
+      const src = box.getAttribute("data-src");
+      const img = new Image();
+      img.className = "auto-screenshot";
+      img.alt = box.textContent.trim();
+      img.onload = () => {
+        box.textContent = "";
+        box.classList.remove("screenshot-placeholder");
+        box.classList.add("image-panel");
+        box.appendChild(img);
+      };
+      img.src = src;
+    });
+  </script>
+</body>
+</html>

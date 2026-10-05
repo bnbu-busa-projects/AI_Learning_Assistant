@@ -1,0 +1,78 @@
+:root {
+    color-scheme: dark;
+
+    --studio-bg: #161411;
+    --studio-bg-2: #211e18;
+    --studio-graphite: #27251f;
+    --studio-graphite-2: #312e27;
+    --studio-graphite-3: #3c372e;
+    --studio-ink: #f4ecdf;
+    --studio-ink-soft: #d5c9b6;
+    --studio-ink-muted: #a99d8b;
+    --studio-ink-faint: #7c7365;
+    --studio-paper: #efe3c9;
+    --studio-paper-2: #fbf1dd;
+    --studio-paper-ink: #282016;
+
+    --studio-line: #564c3d;
+    --studio-line-soft: #413a30;
+    --studio-line-bright: #756751;
+
+    --accent-clay: #bd744b;
+    --accent-terracotta: #c65f3e;
+    --accent-sage: #99a477;
+    --accent-olive: #6f7a55;
+    --accent-amber: #c89a4a;
+    --accent-coral: #d56f61;
+
+    /* Compatibility aliases for the existing component classes. */
+    --accent-teal: var(--accent-clay);
+    --accent-blue: var(--accent-sage);
+    --accent-green: var(--accent-sage);
+    --accent-violet: #b28a63;
+
+    --context-ok: var(--accent-sage);
+    --context-warning: var(--accent-amber);
+    --context-critical: var(--accent-coral);
+
+    --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", "Noto Serif CJK SC", "Noto Serif CJK TC", "Source Han Serif SC", "Source Han Serif TC", serif;
+    --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "PingFang TC", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans CJK TC", sans-serif;
+    --font-mono: "SFMono-Regular", "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 10px;
+
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+
+    --shadow-panel: 0 20px 54px rgb(0 0 0 / 28%);
+    --shadow-paper: 0 22px 60px rgb(0 0 0 / 30%);
+    --shadow-focus: 0 0 0 3px rgb(189 116 75 / 24%);
+}
+
+:lang(zh-Hans) {
+    --font-serif: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "Iowan Old Style", serif;
+}
+
+:lang(zh-Hant) {
+    --font-serif: "Songti TC", "Noto Serif CJK TC", "Source Han Serif TC", "Iowan Old Style", serif;
+}
+
+[data-context-state="ok"] {
+    --context-state-color: var(--context-ok);
+}
+
+[data-context-state="warning"] {
+    --context-state-color: var(--context-warning);
+}
+
+[data-context-state="critical"] {
+    --context-state-color: var(--context-critical);
+}

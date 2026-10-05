@@ -1,0 +1,978 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chapter D: AI Security, Local Models, and Lightweight Dashboards</title>
+  <link rel="stylesheet" href="shared/deck.css">
+</head>
+<body>
+  <section class="slide title-slide">
+    <div class="content">
+      <div class="course-kicker">DOTE 2051 Business Information Systems</div>
+      <div class="lecture-title">Lecture 11: AI Security, Local Models, and Lightweight Dashboards</div>
+      <div class="instructor">Instructor: Wanxue (Wendy) Dong</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Why This Comes After APIs</h1>
+      <div class="flow" style="margin-top: 52px;">
+        <div class="flow-box blue">API key</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Connected workflow</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Security risk</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Control</div>
+      </div>
+      <div class="callout" style="margin-top: 42px;">Once systems connect, data and credentials can move. Security becomes part of the workflow design.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Learning Objectives</h1>
+      <div class="number-list">
+        <div class="number-row"><div class="number">1</div><p>Identify major AI workflow risks.</p></div>
+        <div class="number-row"><div class="number">2</div><p>Classify data before using AI tools.</p></div>
+        <div class="number-row"><div class="number">3</div><p>Explain what local models can and cannot solve.</p></div>
+        <div class="number-row"><div class="number">4</div><p>Understand secure lightweight dashboard design.</p></div>
+        <div class="number-row"><div class="number">5</div><p>Apply a practical checklist to AI-assisted data work.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>AI Security Is Still IS Security</h1>
+      <div class="grid-2">
+        <div class="is-diagram">
+          <div class="ai-layer">Security layer</div>
+          <div class="is-center">Information System</div>
+          <div class="is-node people">People</div>
+          <div class="is-node process">Process</div>
+          <div class="is-node data">Data</div>
+          <div class="is-node tech">Technology</div>
+          <div class="is-node structure">Structure</div>
+        </div>
+        <div>
+          <p>AI changes the tools, but the governance questions remain familiar.</p>
+          <ul>
+            <li>Who has access?</li>
+            <li>What data is being used?</li>
+            <li>Which process checks the output?</li>
+            <li>How is accountability recorded?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>The AI Workflow Attack Surface</h1>
+      <div class="grid-2">
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d01_ai_security_workflow.png" alt="AI security workflow">
+        </div>
+        <div class="status-grid">
+          <div class="status-pill blue">User prompt</div>
+          <div class="status-pill orange">Data file</div>
+          <div class="status-pill red">API key</div>
+          <div class="status-pill">Notebook code</div>
+          <div class="status-pill green">Model output</div>
+          <div class="status-pill">Dashboard</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Risk 1: Data Leakage</h1>
+      <div class="grid-2">
+        <div>
+          <p>Data leakage happens when sensitive information is copied into an AI tool or sent to an external service without appropriate approval.</p>
+          <ul>
+            <li>customer records</li>
+            <li>student grades</li>
+            <li>confidential contracts</li>
+            <li>private operational data</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d02_data_leakage_scenario.png" alt="Data leakage scenario">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Risk 2: Credential Exposure</h1>
+      <div class="grid-2">
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d03_api_key_exposure.png" alt="API key exposure">
+        </div>
+        <div>
+          <p>API keys and tokens are credentials. If they appear in notebooks, screenshots, chat prompts, or repositories, someone else may be able to use them.</p>
+          <div class="warning-banner" style="margin-top: 20px;">Treat keys like passwords, even when they are used inside code.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Risk 3: Prompt Injection</h1>
+      <div class="grid-2">
+        <div>
+          <p>Untrusted text can contain instructions that try to override the user's intent.</p>
+          <div class="flow vertical">
+            <div class="flow-box orange">Document content</div>
+            <div class="flow-box blue">Model reads content</div>
+            <div class="flow-box">Unexpected instruction affects answer</div>
+          </div>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d04_prompt_injection_document.png" alt="Prompt injection document">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Risk 4: Hallucination</h1>
+      <div class="grid-2">
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d05_hallucination_evidence_check.png" alt="Hallucination evidence check">
+        </div>
+        <table class="table">
+          <thead><tr><th>AI output</th><th>Verification question</th></tr></thead>
+          <tbody>
+            <tr><td>The claim sounds fluent.</td><td>What source supports it?</td></tr>
+            <tr><td>The chart looks plausible.</td><td>What data produced it?</td></tr>
+            <tr><td>The recommendation is confident.</td><td>What assumptions are hidden?</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Risk 5: Bias and Fairness</h1>
+      <div class="grid-3">
+        <div class="card"><h2>Training data</h2><p>May reflect historical patterns and missing groups.</p></div>
+        <div class="card"><h2>Features</h2><p>May encode sensitive information indirectly.</p></div>
+        <div class="card"><h2>Outputs</h2><p>May affect people differently across groups.</p></div>
+      </div>
+      <div class="callout" style="margin-top: 36px;">Fairness is not only a model property. It is also a business process question.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Risk 6: Supply Chain and Licensing</h1>
+      <div class="flow" style="margin-top: 44px;">
+        <div class="flow-box blue">Dataset</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Package</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Model</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Output</div>
+      </div>
+      <div class="grid-3" style="margin-top: 36px;">
+        <div class="card"><h2>Source</h2><p>Where did it come from?</p></div>
+        <div class="card"><h2>License</h2><p>What are we allowed to do?</p></div>
+        <div class="card"><h2>Maintenance</h2><p>Is it current and trusted?</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Data Classification</h1>
+      <div class="grid-2">
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d06_data_classification_levels.png" alt="Data classification levels">
+        </div>
+        <table class="table">
+          <thead><tr><th>Level</th><th>Example</th><th>AI use</th></tr></thead>
+          <tbody>
+            <tr><td>Public</td><td>Published data</td><td>Usually acceptable</td></tr>
+            <tr><td>Internal</td><td>Course files</td><td>Check policy</td></tr>
+            <tr><td>Confidential</td><td>Business records</td><td>Restrict or anonymize</td></tr>
+            <tr><td>Personal</td><td>Identifiable people</td><td>High caution</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Can Be Used in Class?</h1>
+      <div class="checkpoint">
+        <h2>Classroom rule</h2>
+        <ul class="checklist">
+          <li>Use public datasets from approved sources.</li>
+          <li>Use course-provided sample data.</li>
+          <li>Use fake placeholder credentials in examples.</li>
+          <li>Ask before using data from a real organization.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Should Not Be Uploaded?</h1>
+      <div class="grid-2">
+        <div class="warning-banner">
+          <h2>Do not paste or upload</h2>
+          <ul>
+            <li>student records</li>
+            <li>customer records</li>
+            <li>API keys or passwords</li>
+            <li>proprietary documents</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Better alternative</h2>
+          <p>Use a small, de-identified sample. Share the question, the schema, or an aggregate summary instead of raw sensitive rows.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>De-Identification</h1>
+      <table class="table">
+        <thead><tr><th>Before</th><th>After</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td>name: Chen Wei</td><td>customer_id: C1042</td><td>Remove direct name</td></tr>
+          <tr><td>email: student@example.edu</td><td>email_domain: example.edu</td><td>Generalize identifier</td></tr>
+          <tr><td>exact birth date</td><td>age group</td><td>Reduce identifiability</td></tr>
+          <tr><td>full address</td><td>country or region</td><td>Keep useful context</td></tr>
+        </tbody>
+      </table>
+      <div class="callout" style="margin-top: 24px;">De-identification reduces risk, but it is not magic. Context can still re-identify people.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Aggregation</h1>
+      <div class="flow" style="margin-top: 48px;">
+        <div class="flow-box orange">Raw transaction rows</div><div class="arrow">&rarr;</div>
+        <div class="flow-box blue">Group by month and country</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Summary table or chart</div>
+      </div>
+      <div class="kpi-row" style="margin-top: 42px;">
+        <div class="kpi-card"><div class="kpi-label">Rows shared</div><div class="kpi-value">12</div></div>
+        <div class="kpi-card"><div class="kpi-label">Personal fields</div><div class="kpi-value">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Business value</div><div class="kpi-value">High</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Minimum Necessary Data</h1>
+      <div class="grid-2">
+        <div>
+          <p>Send only the fields and rows needed for the task.</p>
+          <ul>
+            <li>Start with a small sample.</li>
+            <li>Remove unrelated columns.</li>
+            <li>Prefer summary statistics when possible.</li>
+          </ul>
+        </div>
+        <div class="flow vertical">
+          <div class="flow-box orange">Full dataset</div>
+          <div class="flow-box blue">Needed columns</div>
+          <div class="flow-box green">Task-specific sample</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Human Review Points</h1>
+      <div class="loop">
+        <div class="loop-step"><strong>Before upload</strong>Classify data and remove sensitive fields.</div>
+        <div class="loop-step"><strong>After code</strong>Read generated code before running it.</div>
+        <div class="loop-step"><strong>After output</strong>Check evidence and assumptions.</div>
+        <div class="loop-step"><strong>Before decision</strong>Decide what a human must approve.</div>
+      </div>
+      <div class="callout" style="margin-top: 40px;">Security is a review habit, not a one-time checkbox.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Technical Control: Environment Variables</h1>
+      <div class="grid-2">
+        <div class="code-box"># .env.example
+MODEL_API_KEY=your_key_here
+MODEL_BASE_URL=https://example.com/v1
+MODEL_NAME=example-model</div>
+        <div>
+          <ul>
+            <li>Keep real secrets outside notebooks.</li>
+            <li>Commit only `.env.example`.</li>
+            <li>Load secrets at runtime.</li>
+            <li>Never show real keys in slides or screenshots.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Technical Control: Access Scope</h1>
+      <div class="grid-3">
+        <div class="card"><h2>Least privilege</h2><p>Give a key only the access it needs.</p></div>
+        <div class="card"><h2>Separate keys</h2><p>Use different keys for demos, teams, and production.</p></div>
+        <div class="card"><h2>Rotation</h2><p>Replace exposed or old keys quickly.</p></div>
+      </div>
+      <div class="warning-banner" style="margin-top: 36px;">A key that can do everything creates a bigger incident when it leaks.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Technical Control: Logging and Audit</h1>
+      <table class="table">
+        <thead><tr><th>Record</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td>Data source and date</td><td>Supports reproducibility.</td></tr>
+          <tr><td>Model or tool used</td><td>Explains where output came from.</td></tr>
+          <tr><td>Prompt or analysis instruction</td><td>Shows the workflow logic.</td></tr>
+          <tr><td>Assumptions and limitations</td><td>Prevents overclaiming.</td></tr>
+          <tr><td>Human reviewer</td><td>Creates accountability.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Local Models as a Mitigation</h1>
+      <div class="grid-2">
+        <div>
+          <p>Running a model locally can reduce external data transfer. It can be useful for demos, experimentation, and sensitive workflows.</p>
+          <div class="callout" style="margin-top: 20px;">Local does not automatically mean safe. It changes the risk profile.</div>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d07_local_vs_cloud_model.png" alt="Local model versus cloud model">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Local Models Help With</h1>
+      <div class="grid-4">
+        <div class="card"><h2>Data residency</h2><p>Reduce external transfer.</p></div>
+        <div class="card"><h2>Offline demos</h2><p>Run without a cloud API.</p></div>
+        <div class="card"><h2>Experimentation</h2><p>Try model behavior locally.</p></div>
+        <div class="card"><h2>Cost control</h2><p>Reduce usage-based API calls.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Local Models Do Not Solve</h1>
+      <div class="grid-3">
+        <div class="card"><h2>Hallucination</h2><p>Local models can still be wrong.</p></div>
+        <div class="card"><h2>Bias</h2><p>Model behavior still depends on data and design.</p></div>
+        <div class="card"><h2>Weak devices</h2><p>Performance may be limited.</p></div>
+        <div class="card"><h2>Licensing</h2><p>Terms still matter.</p></div>
+        <div class="card"><h2>Prompt injection</h2><p>Untrusted text remains risky.</p></div>
+        <div class="card"><h2>Bad output</h2><p>Human review is still required.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Optional Local Model Runtime</h1>
+      <div class="flow" style="margin-top: 58px;">
+        <div class="flow-box blue">Local app</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Local chat endpoint</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Local model</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Response</div>
+      </div>
+      <div class="callout" style="margin-top: 42px;">This course does not require local model setup. Understand the concept and trade-offs.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Local vs Cloud Decision</h1>
+      <table class="table">
+        <thead><tr><th>Question</th><th>Local may fit</th><th>Cloud may fit</th></tr></thead>
+        <tbody>
+          <tr><td>Data sensitivity</td><td>Higher sensitivity</td><td>Public or approved data</td></tr>
+          <tr><td>Performance needs</td><td>Small local tasks</td><td>Large models or scale</td></tr>
+          <tr><td>Convenience</td><td>More setup</td><td>Managed service</td></tr>
+          <tr><td>Governance</td><td>Local controls</td><td>Vendor controls and contracts</td></tr>
+          <tr><td>Cost</td><td>Hardware cost</td><td>Usage cost</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>From Notebook to Dashboard</h1>
+      <div class="flow" style="margin-top: 56px;">
+        <div class="flow-box blue">Notebook analysis</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Reusable functions</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Dashboard interface</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Repeated business use</div>
+      </div>
+      <div class="callout" style="margin-top: 40px;">A dashboard turns one analysis into a repeatable information system.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Why a Lightweight Dashboard?</h1>
+      <div class="grid-2">
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d08_streamlit_dashboard_mock.png" alt="Lightweight dashboard mock">
+        </div>
+        <div>
+          <ul>
+            <li>Shows BI results in a browser.</li>
+            <li>Uses familiar Python code.</li>
+            <li>Supports filters and repeated exploration.</li>
+            <li>Avoids heavy web development.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Dataset Source</h1>
+      <div class="card" style="margin-top: 28px;">
+        <h2>UCI Online Retail</h2>
+        <p>Transactional data from a UK-based online retail business. We use a classroom-friendly sample for dashboard work.</p>
+        <p class="muted">Citation: Chen, D., Sain, S. L., and Guo, K. (2012). Data mining for the online retail industry: A case study of RFM model-based customer segmentation using data mining.</p>
+      </div>
+      <div class="callout" style="margin-top: 28px;">Dataset choice matters: source, permission, cleaning rules, and limitations should be visible.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Student File Name</h1>
+      <div class="exercise-box">
+        <div>
+          <h2><code>online_retail_transactions_sample.csv</code></h2>
+          <p class="muted">A friendly course filename for the UCI Online Retail sample.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Dashboard Business Questions</h1>
+      <div class="grid-4">
+        <div class="card"><h2>Revenue trend</h2><p>How does revenue change over time?</p></div>
+        <div class="card"><h2>Country performance</h2><p>Which markets contribute most?</p></div>
+        <div class="card"><h2>Top products</h2><p>Which products drive sales?</p></div>
+        <div class="card"><h2>Customer behavior</h2><p>How many customers and orders appear?</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Dashboard Structure</h1>
+      <div class="dashboard-wireframe">
+        <div class="dashboard-sidebar">
+          <h2>Filters</h2>
+          <div class="filter-line"></div>
+          <div class="filter-line"></div>
+          <div class="filter-line"></div>
+        </div>
+        <div class="dashboard-main">
+          <div class="dashboard-kpis">
+            <div class="dashboard-kpi"><span>Total revenue</span><strong>$42K</strong></div>
+            <div class="dashboard-kpi"><span>Orders</span><strong>318</strong></div>
+            <div class="dashboard-kpi"><span>Customers</span><strong>127</strong></div>
+          </div>
+          <div class="dashboard-body">
+            <div class="dashboard-chart">Revenue trend</div>
+            <div class="dashboard-table">Top products</div>
+          </div>
+          <div class="dashboard-insight">Insight panel with source label and timestamp</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Streamlit in One Slide</h1>
+      <div class="grid-2">
+        <div class="code-box">import streamlit as st
+import pandas as pd
+
+df = pd.read_csv("data/online_retail_transactions_sample.csv")
+st.title("Online Retail Dashboard")
+st.dataframe(df.head())</div>
+        <div class="flow vertical">
+          <div class="flow-box blue">Python script</div>
+          <div class="flow-box green">Local browser page</div>
+          <div class="flow-box orange">Interactive dashboard</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Demo Folder</h1>
+      <div class="project-tree">demo_dashboard/
+  app.py
+  requirements.txt
+  README.md
+  .env.example
+  data/
+    online_retail_transactions_sample.csv</div>
+      <div class="callout" style="margin-top: 28px;">Students should run the dashboard locally. No deployment packaging is needed for this course.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Dashboard Component 1: Filters</h1>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>Date range</li>
+            <li>Country selector</li>
+            <li>Product search</li>
+            <li>Graceful empty results</li>
+          </ul>
+        </div>
+        <div class="dashboard-sidebar" style="height: 270px; border: 1px solid var(--line); border-radius: 6px;">
+          <h2>Filters</h2>
+          <div class="filter-line"></div>
+          <div class="filter-line"></div>
+          <div class="filter-line"></div>
+          <div class="filter-line"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Dashboard Component 2: KPI Cards</h1>
+      <div class="kpi-row" style="margin-top: 44px;">
+        <div class="kpi-card"><div class="kpi-label">Total revenue</div><div class="kpi-value">$86K</div></div>
+        <div class="kpi-card"><div class="kpi-label">Orders</div><div class="kpi-value">1,240</div></div>
+        <div class="kpi-card"><div class="kpi-label">Customers</div><div class="kpi-value">392</div></div>
+      </div>
+      <p class="muted" style="margin-top: 34px;">Values here are visual examples. The dashboard will compute real values from the sample CSV.</p>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Dashboard Component 3: Trend Chart</h1>
+      <div class="line-chart">
+        <svg viewBox="0 0 360 170" aria-hidden="true">
+          <polyline points="0,140 42,118 84,130 126,95 168,102 210,70 252,78 294,42 340,55" fill="none" stroke="#4f2385" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="axis-note">Revenue over time after filters are applied</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Dashboard Component 4: Top Products</h1>
+      <div class="grid-2">
+        <div class="mini-chart">
+          <div class="bar" style="height: 82%;"></div>
+          <div class="bar green" style="height: 70%;"></div>
+          <div class="bar orange" style="height: 58%;"></div>
+          <div class="bar" style="height: 42%;"></div>
+          <div class="bar green" style="height: 36%;"></div>
+        </div>
+        <table class="table">
+          <thead><tr><th>Product</th><th>Revenue</th></tr></thead>
+          <tbody>
+            <tr><td>Gift set</td><td>$12,400</td></tr>
+            <tr><td>Decor item</td><td>$9,800</td></tr>
+            <tr><td>Storage box</td><td>$7,600</td></tr>
+            <tr><td>Candle holder</td><td>$5,900</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Dashboard Component 5: AI Insight Panel</h1>
+      <div class="grid-2">
+        <div class="card">
+          <h2>Draft insight</h2>
+          <p>Revenue is concentrated in a small set of products. The manager may review product availability and promotion timing.</p>
+          <p class="muted">Generated from filtered dashboard data at 10:30.</p>
+        </div>
+        <div>
+          <ul class="checklist">
+            <li>Label narrative as draft.</li>
+            <li>Cite the filtered source data.</li>
+            <li>Allow the panel to be disabled.</li>
+            <li>Require human review before decisions.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Safe Insight Design</h1>
+      <div class="grid-4">
+        <div class="card"><h2>Label</h2><p>Draft, not final truth.</p></div>
+        <div class="card"><h2>Source</h2><p>Show filtered data basis.</p></div>
+        <div class="card"><h2>Time</h2><p>Show when generated.</p></div>
+        <div class="card"><h2>Disable</h2><p>Keep dashboard useful without AI.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Security in the Dashboard</h1>
+      <div class="grid-2">
+        <ul class="checklist">
+          <li>No hardcoded secrets.</li>
+          <li>No sensitive sample data.</li>
+          <li>Validate filter inputs.</li>
+          <li>Document data source.</li>
+        </ul>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d09_secure_dashboard_review.png" alt="Secure dashboard review">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Notebook Demo Link</h1>
+      <div class="grid-2">
+        <div>
+          <p>The notebook prepares the data and introduces security checks before the dashboard is built.</p>
+          <ul>
+            <li>classify dataset sensitivity</li>
+            <li>scan toy config text for secrets</li>
+            <li>aggregate retail metrics</li>
+          </ul>
+        </div>
+        <div class="screenshot-placeholder" data-src="../slide_assets/screenshots/d_security_notebook_secret_scan.png">
+          <div><strong>Screenshot placeholder</strong>d_security_notebook_secret_scan.png</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Cursor Build Prompt</h1>
+      <div class="prompt-box">Build a minimal local Streamlit dashboard using data/online_retail_transactions_sample.csv.
+
+Requirements:
+- load and preview the data
+- add country and date filters
+- show KPI cards and revenue trend
+- include a safe draft insight panel
+- do not hardcode secrets</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>First Build Target</h1>
+      <div class="grid-2">
+        <div>
+          <h2>Small win</h2>
+          <ul>
+            <li>Load CSV.</li>
+            <li>Show dashboard title.</li>
+            <li>Display first five rows.</li>
+          </ul>
+        </div>
+        <div class="code-box">df = pd.read_csv(DATA_PATH)
+st.title("Online Retail Dashboard")
+st.dataframe(df.head())</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Second Build Target</h1>
+      <div class="grid-2">
+        <div>
+          <h2>Add filters and KPI cards</h2>
+          <ul>
+            <li>country filter</li>
+            <li>date range filter</li>
+            <li>total revenue</li>
+            <li>orders and customers</li>
+          </ul>
+        </div>
+        <div class="kpi-row" style="grid-template-columns: 1fr; gap: 10px;">
+          <div class="kpi-card"><div class="kpi-label">Revenue</div><div class="kpi-value">$42K</div></div>
+          <div class="kpi-card"><div class="kpi-label">Orders</div><div class="kpi-value">318</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Third Build Target</h1>
+      <div class="grid-2">
+        <div>
+          <h2>Add charts and product table</h2>
+          <ul>
+            <li>monthly revenue line chart</li>
+            <li>country or product bar chart</li>
+            <li>top product table</li>
+          </ul>
+        </div>
+        <div class="mini-chart">
+          <div class="bar" style="height: 54%;"></div>
+          <div class="bar green" style="height: 68%;"></div>
+          <div class="bar orange" style="height: 46%;"></div>
+          <div class="bar" style="height: 76%;"></div>
+          <div class="bar green" style="height: 62%;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Fourth Build Target</h1>
+      <div class="grid-2">
+        <div>
+          <h2>Add safe insight panel</h2>
+          <ul>
+            <li>rule-based fallback text</li>
+            <li>optional LLM if configured</li>
+            <li>source and timestamp</li>
+            <li>visible review warning</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>Draft insight</h2>
+          <p>Top products drive a large share of filtered revenue. Review stock and promotion timing.</p>
+          <p class="muted">Source: filtered dashboard data.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Browser Verification</h1>
+      <div class="grid-2">
+        <ul class="checklist">
+          <li>Local URL opens.</li>
+          <li>Filters update charts.</li>
+          <li>Empty states are understandable.</li>
+          <li>No visible secrets appear.</li>
+        </ul>
+        <div class="screenshot-placeholder" data-src="../slide_assets/screenshots/d_streamlit_empty_filter_state.png">
+          <div><strong>Screenshot placeholder</strong>d_streamlit_empty_filter_state.png</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Common Error: Missing Package</h1>
+      <div class="grid-2">
+        <div class="code-box">ModuleNotFoundError:
+No module named 'streamlit'</div>
+        <div>
+          <h2>Fix</h2>
+          <div class="code-box">pip install -r requirements.txt
+streamlit run app.py</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Common Error: Wrong Data Path</h1>
+      <div class="grid-2">
+        <div class="project-tree">demo_dashboard/
+  app.py
+  data/
+    online_retail_transactions_sample.csv</div>
+        <div>
+          <ul>
+            <li>Run Streamlit from the demo folder.</li>
+            <li>Use the project `data/` folder.</li>
+            <li>Print the file path when debugging.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Common Error: Blank Chart</h1>
+      <div class="grid-3">
+        <div class="card"><h2>Filter</h2><p>The selected filters may return no rows.</p></div>
+        <div class="card"><h2>Date parsing</h2><p>The date column may still be text.</p></div>
+        <div class="card"><h2>Aggregation</h2><p>The groupby result may be empty.</p></div>
+      </div>
+      <div class="callout" style="margin-top: 38px;">Debug the data shape before debugging the chart.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>In-Class Exercise</h1>
+      <div class="exercise-box">
+        <div>
+          <h2>Add one new chart</h2>
+          <p>Then write two sentences explaining whether it changes the business recommendation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Security Checklist</h1>
+      <div class="grid-2">
+        <table class="table small">
+          <thead><tr><th>Area</th><th>Question</th></tr></thead>
+          <tbody>
+            <tr><td>Data</td><td>Is sensitivity classified?</td></tr>
+            <tr><td>Credentials</td><td>Are secrets outside code?</td></tr>
+            <tr><td>Code</td><td>Was generated code reviewed?</td></tr>
+            <tr><td>Model</td><td>Is the model choice appropriate?</td></tr>
+            <tr><td>Output</td><td>Is evidence checked?</td></tr>
+            <tr><td>Decision</td><td>Who approves action?</td></tr>
+          </tbody>
+        </table>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d10_final_security_checklist.png" alt="Final security checklist">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What to Submit</h1>
+      <div class="grid-3">
+        <div class="card"><h2>Notebook</h2><p>Security checks and dashboard preparation.</p></div>
+        <div class="card"><h2>Screenshot</h2><p>Local dashboard running in browser.</p></div>
+        <div class="card"><h2>Reflection</h2><p>Short note on risk and verification.</p></div>
+      </div>
+      <div class="screenshot-placeholder" data-src="../slide_assets/screenshots/d_dashboard_target.png" style="margin-top: 22px; min-height: 145px;">
+        <div><strong>Screenshot placeholder</strong>d_dashboard_target.png</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Rubric</h1>
+      <table class="table">
+        <thead><tr><th>Criterion</th><th>Good evidence</th></tr></thead>
+        <tbody>
+          <tr><td>Security awareness</td><td>Correctly classifies data and protects credentials.</td></tr>
+          <tr><td>Dashboard functionality</td><td>Filters, KPIs, charts, and table work.</td></tr>
+          <tr><td>Insight quality</td><td>Narrative is useful and tied to data.</td></tr>
+          <tr><td>Verification</td><td>Browser test and output checks are documented.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Key Takeaways</h1>
+      <div class="grid-3" style="margin-top: 34px;">
+        <div class="takeaway"><h2>Governance comes first</h2><p>Classify data and set rules before using tools.</p></div>
+        <div class="takeaway"><h2>Controls are practical</h2><p>Secrets, scopes, logs, and reviews reduce risk.</p></div>
+        <div class="takeaway"><h2>Dashboards are IS</h2><p>They combine data, process, technology, and decisions.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const footerText = "DOTE 2051 Business Information Systems ";
+    const slides = document.querySelectorAll(".slide");
+    slides.forEach((slide, index) => {
+      slide.id = `slide-${index + 1}`;
+      const mark = document.createElement("div");
+      mark.className = "bnbu-mark";
+      mark.setAttribute("aria-label", "BNBU");
+      mark.textContent = "BNBU";
+      slide.appendChild(mark);
+
+      const footer = document.createElement("div");
+      footer.className = "footer";
+      footer.textContent = footerText;
+      slide.appendChild(footer);
+
+      const number = document.createElement("div");
+      number.className = "slide-number";
+      number.textContent = `${index + 1} / 57`;
+      slide.appendChild(number);
+    });
+
+    const requestedSlide = Number(new URLSearchParams(window.location.search).get("slide"));
+    if (Number.isInteger(requestedSlide) && requestedSlide >= 1 && requestedSlide <= slides.length) {
+      window.addEventListener("load", () => {
+        slides[requestedSlide - 1].scrollIntoView({ block: "start" });
+      });
+    }
+
+    document.querySelectorAll(".screenshot-placeholder[data-src]").forEach((box) => {
+      const src = box.getAttribute("data-src");
+      const img = new Image();
+      img.className = "auto-screenshot";
+      img.alt = box.textContent.trim();
+      img.onload = () => {
+        box.textContent = "";
+        box.classList.remove("screenshot-placeholder");
+        box.classList.add("image-panel");
+        box.appendChild(img);
+      };
+      img.src = src;
+    });
+  </script>
+</body>
+</html>

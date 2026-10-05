@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sample HTML Slide Deck</title>
+  <style>
+    @page { size: 10in 5.625in; margin: 0; }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      background: #e7e7ea;
+      color: #171717;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      padding: 18px;
+    }
+    .slide {
+      position: relative;
+      width: 10in;
+      height: 5.625in;
+      overflow: hidden;
+      background: #ffffff;
+      border: 1px solid #d4d4d4;
+      page-break-after: always;
+    }
+    .slide:last-child { page-break-after: auto; }
+    .content { position: absolute; inset: 54px 54px 44px 54px; }
+    .title-slide .content {
+      inset: 0 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .course-kicker { font-size: 15px; font-weight: 700; margin-bottom: 22px; }
+    .lecture-title { font-size: 28px; line-height: 1.2; margin: 0 0 24px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .card { border: 1px solid #d9dce3; background: #f7f8fb; border-radius: 6px; padding: 16px; }
+    .callout { border-left: 7px solid #d88a19; background: #fff9ef; padding: 16px 18px; }
+    h1 { margin: 0 0 24px; font-size: 27px; }
+    h2 { margin: 0 0 10px; font-size: 19px; color: #4f2385; }
+    p, li { font-size: 18px; line-height: 1.34; }
+    @media print {
+      html, body {
+        width: 10in;
+        margin: 0;
+        padding: 0;
+        background: #ffffff;
+      }
+      body {
+        display: block;
+      }
+      .slide {
+        border: 0;
+        break-after: page;
+        page-break-after: always;
+      }
+      .slide:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="slide title-slide">
+    <div class="content">
+      <div class="course-kicker">Information Systems</div>
+      <h1 class="lecture-title">AI Workflows in Business</h1>
+      <p class="instructor">Sample deck for HTML-to-PDF integration testing</p>
+    </div>
+  </section>
+  <section class="slide">
+    <div class="content">
+      <h1>Decision Support</h1>
+      <div class="grid-2">
+        <div class="card"><h2>Inputs</h2><p>Tasks, policies, prior cases, and data quality notes.</p></div>
+        <div class="card"><h2>Outputs</h2><p>Draft plans, summaries, code, and inspectable artifacts.</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="slide">
+    <div class="content">
+      <h1>Operational Guardrails</h1>
+      <div class="callout">Keep humans accountable for review, exception handling, and final publication.</div>
+      <ul>
+        <li>Record sources and assumptions.</li>
+        <li>Preserve generated source files.</li>
+        <li>Test before distribution.</li>
+      </ul>
+    </div>
+  </section>
+</body>
+</html>

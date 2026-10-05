@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chapter C: Cloud, Remote Computing, and LLM APIs</title>
+  <link rel="stylesheet" href="shared/deck.css">
+</head>
+<body>
+  <section class="slide title-slide">
+    <div class="content">
+      <div class="course-kicker">DOTE 2051 Business Information Systems</div>
+      <h1 class="lecture-title">Lecture 10: Cloud, Remote Computing, and LLM APIs</h1>
+      <div class="instructor">Instructor: Wanxue (Wendy) Dong</div> 
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Why This Comes Before AI Security</h1>
+      <div class="flow" style="margin-top: 62px;">
+        <div class="flow-box blue">Cloud services</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">APIs and keys</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">AI workflows</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Security risks</div>
+      </div>
+      <div class="callout" style="margin-top: 46px;">Students need to understand how systems connect before discussing how those connections can fail.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Learning Objectives</h1>
+      <div class="number-list">
+        <div class="number-row"><div class="number">1</div><p>Explain SaaS, PaaS, IaaS, and remote computing in AI-era business systems.</p></div>
+        <div class="number-row"><div class="number">2</div><p>Describe what an API is and how request/response workflows work.</p></div>
+        <div class="number-row"><div class="number">3</div><p>Explain API keys, endpoints, tokens, rate limits, latency, and cost at a beginner level.</p></div>
+        <div class="number-row"><div class="number">4</div><p>Interpret a simple LLM API workflow without deploying a cloud service.</p></div>
+        <div class="number-row"><div class="number">5</div><p>Compare AI SaaS, API integration, local models, and custom systems.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Recall: Cloud Computing</h1>
+      <div class="grid-2">
+        <div>
+          <p>Cloud computing means software and hardware resources are delivered over a network.</p>
+          <ul>
+            <li>Users do not manage every machine directly.</li>
+            <li>Services can scale up or down.</li>
+            <li>Organizations pay for access, usage, or managed capability.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/c01_cloud_ai_infrastructure.png" alt="Cloud AI infrastructure">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Why AI Uses Cloud Services</h1>
+      <div class="grid-4">
+        <div class="card"><h2>Compute</h2><p>Large models require powerful hardware.</p></div>
+        <div class="card"><h2>Data</h2><p>Systems need storage, retrieval, and governance.</p></div>
+        <div class="card"><h2>Model hosting</h2><p>Organizations call hosted models instead of running everything locally.</p></div>
+        <div class="card"><h2>Scaling</h2><p>Services can handle more users and requests.</p></div>
+      </div>
+      <div class="callout" style="margin-top: 38px;">Cloud is not just a place. It is a service model for business systems.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>AI Needs Remote Computing</h1>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>Training models can require specialized hardware.</li>
+            <li>Serving models can require fast response at scale.</li>
+            <li>A lightweight laptop can use a powerful remote service.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/c07_remote_gpu_compute.png" alt="Remote GPU compute">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Is a Server?</h1>
+      <div class="grid-2">
+        <div>
+          <p>A server is a computer or service that responds to requests from clients.</p>
+          <ul>
+            <li>The client asks for something.</li>
+            <li>The server processes the request.</li>
+            <li>The server returns a response.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/c02_client_server_request.png" alt="Client server request">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Is an API?</h1>
+      <div class="grid-2 top">
+        <div class="card">
+          <h2>Plain English</h2>
+          <p>An API is a contract for software systems to communicate.</p>
+        </div>
+        <div class="card">
+          <h2>Business view</h2>
+          <p>An API lets one system safely use a service or data from another system.</p>
+        </div>
+      </div>
+      <div class="flow" style="margin-top: 48px;">
+        <div class="flow-box blue">App</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">API contract</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Service</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Response</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>API Request and Response</h1>
+      <table class="table">
+        <thead><tr><th>Request part</th><th>Meaning</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Method</td><td>What action?</td><td><code>GET</code> or <code>POST</code></td></tr>
+          <tr><td>URL</td><td>Where is the service?</td><td><code>/v2/country/...</code></td></tr>
+          <tr><td>Headers</td><td>Extra information</td><td>format, API key, content type</td></tr>
+          <tr><td>Body</td><td>Data sent to service</td><td>messages, filters, parameters</td></tr>
+          <tr><td>Response</td><td>What comes back?</td><td>status code and data</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Endpoint</h1>
+      <p>An endpoint is the specific address for one service operation.</p>
+      <div class="code-box" style="font-size: 23px; margin-top: 46px;">https://api.worldbank.org/v2/country/CHN/indicator/NY.GDP.MKTP.CD</div>
+      <div class="grid-3" style="margin-top: 32px;">
+        <div class="card"><h2>Base URL</h2><p>The service location.</p></div>
+        <div class="card"><h2>Path</h2><p>The operation or data requested.</p></div>
+        <div class="card"><h2>Parameters</h2><p>Filters such as format or date.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>API Key</h1>
+      <div class="grid-2">
+        <div>
+          <p>An API key is a secret credential used to identify and authorize a caller.</p>
+          <ul>
+            <li>It is not a password for a person.</li>
+            <li>It grants access to a service account or project.</li>
+            <li>It should not be pasted into slides, notebooks, or public repositories.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/c03_api_key_as_credential.png" alt="API key credential">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Why Services Use API Keys</h1>
+      <div class="grid-4">
+        <div class="card"><h2>Access control</h2><p>Who can use the service?</p></div>
+        <div class="card"><h2>Billing</h2><p>Who pays for usage?</p></div>
+        <div class="card"><h2>Quotas</h2><p>How much can be used?</p></div>
+        <div class="card"><h2>Monitoring</h2><p>Which app made requests?</p></div>
+      </div>
+      <div class="callout" style="margin-top: 40px;">Today we learn what keys are. Chapter D explains how key leakage becomes a security problem.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Public API Without a Key</h1>
+      <div class="grid-2">
+        <div>
+          <p>The World Bank Indicators API is useful for teaching because it can be called without student credentials.</p>
+          <ul>
+            <li>Public economic indicator data.</li>
+            <li>Real endpoint and JSON response.</li>
+            <li>Good practice before using paid LLM APIs.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/c04_world_bank_api_demo.png" alt="World Bank API demo">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Notebook Demo Preview</h1>
+      <div class="grid-2">
+        <div>
+          <ul>
+            <li>Call a public API.</li>
+            <li>Inspect JSON.</li>
+            <li>Convert to a dataframe.</li>
+            <li>Plot a trend.</li>
+          </ul>
+        </div>
+        <div class="screenshot-placeholder" data-src="../slide_assets/screenshots/c_world_bank_api_json.png">
+          <div><strong>Screenshot placeholder</strong><p>c_world_bank_api_json.png</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>JSON in Plain English</h1>
+      <div class="grid-2">
+        <div class="code-box">{
+  "country": "China",
+  "indicator": "GDP",
+  "year": 2023,
+  "value": 17794782000000
+}</div>
+        <div>
+          <ul>
+            <li>JSON stores data as key-value pairs.</li>
+            <li>It can include nested lists and objects.</li>
+            <li>APIs often return JSON because programs can parse it.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>From JSON to Table</h1>
+      <div class="flow" style="margin-top: 58px;">
+        <div class="flow-box blue">JSON response</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Parse fields</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Dataframe rows</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Chart or table</div>
+      </div>
+      <div class="callout" style="margin-top: 44px;">This is the same data-analysis logic from Chapter B, now with data from a remote service.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>SaaS</h1>
+      <div class="card" style="margin-top: 28px;">
+        <h2>Software as a Service</h2>
+        <p>Complete software used through a browser or app. The provider manages most of the infrastructure.</p>
+      </div>
+      <div class="grid-3" style="margin-top: 30px;">
+        <div class="card"><h2>User focus</h2><p>Use the tool.</p></div>
+        <div class="card"><h2>Provider manages</h2><p>App, servers, scaling, updates.</p></div>
+        <div class="card"><h2>AI example</h2><p>Chat tools, copilots, analytics dashboards.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>PaaS</h1>
+      <div class="card" style="margin-top: 28px;">
+        <h2>Platform as a Service</h2>
+        <p>A managed platform for building and running applications.</p>
+      </div>
+      <div class="flow" style="margin-top: 54px;">
+        <div class="flow-box blue">Developer</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Managed platform</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Application</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Users</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>IaaS</h1>
+      <div class="card" style="margin-top: 28px;">
+        <h2>Infrastructure as a Service</h2>
+        <p>Renting compute, storage, and networking resources instead of buying and maintaining all hardware.</p>
+      </div>
+      <div class="grid-3" style="margin-top: 34px;">
+        <div class="card"><h2>Virtual machines</h2><p>Remote computers.</p></div>
+        <div class="card"><h2>Storage</h2><p>Data and files.</p></div>
+        <div class="card"><h2>GPU resources</h2><p>Specialized compute for AI workloads.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>SaaS vs PaaS vs IaaS in AI</h1>
+      <table class="table">
+        <thead><tr><th>Model</th><th>What the business gets</th><th>What the business manages</th></tr></thead>
+        <tbody>
+          <tr><td>SaaS</td><td>Ready-to-use AI software</td><td>Users, data policy, workflow fit</td></tr>
+          <tr><td>PaaS</td><td>Platform to build AI apps</td><td>Application logic and integration</td></tr>
+          <tr><td>IaaS</td><td>Remote compute, storage, network</td><td>More technical configuration</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>AI Service Stack</h1>
+      <div class="flow vertical" style="gap: 12px;">
+        <div class="flow-box blue">Business app or notebook</div>
+        <div class="flow-box green">API gateway</div>
+        <div class="flow-box orange">Model service</div>
+        <div class="flow-box">Data store and retrieval</div>
+        <div class="flow-box blue">Monitoring, cost, and logs</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>What Is an LLM API?</h1>
+      <div class="grid-2">
+        <div>
+          <p>An LLM API is a service that takes messages and returns model output.</p>
+          <ul>
+            <li>Your app sends a request.</li>
+            <li>The model service generates a response.</li>
+            <li>The response may include usage metadata.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/c05_llm_api_pipeline.png" alt="LLM API pipeline">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Anatomy of an LLM Request</h1>
+      <div class="code-box">{
+  "model": "example-model",
+  "messages": [
+    {"role": "system", "content": "Be concise."},
+    {"role": "user", "content": "Summarize this table."}
+  ],
+  "temperature": 0.2,
+  "max_output_tokens": 300
+}</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Anatomy of an LLM Response</h1>
+      <div class="code-box">{
+  "output_text": "The table shows...",
+  "usage": {
+    "input_tokens": 420,
+    "output_tokens": 86
+  },
+  "status": "completed"
+}</div>
+      <div class="callout" style="margin-top: 26px;">The text is only one part of the response. Usage metadata also matters for cost and system design.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Tokens</h1>
+      <div class="grid-2">
+        <div>
+          <p>Tokens are units used for input, output, context, and billing.</p>
+          <ul>
+            <li>They are roughly pieces of text.</li>
+            <li>Longer prompts and longer outputs cost more.</li>
+            <li>Token limits affect how much context the model can use.</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/c06_tokens_context_window.png" alt="Tokens and context window">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Context Window</h1>
+      <div class="flow" style="margin-top: 62px;">
+        <div class="flow-box blue">Instructions</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">User question</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Relevant data</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Model output</div>
+      </div>
+      <div class="callout" style="margin-top: 44px;">The context window is the amount of information the model can consider at once.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Cost</h1>
+      <div class="kpi-row" style="margin-top: 50px;">
+        <div class="kpi-card"><div class="kpi-label">Input</div><div class="kpi-value">tokens</div></div>
+        <div class="kpi-card"><div class="kpi-label">Output</div><div class="kpi-value">tokens</div></div>
+        <div class="kpi-card"><div class="kpi-label">Usage</div><div class="kpi-value">cost</div></div>
+      </div>
+      <div class="callout" style="margin-top: 38px;">Use illustrative numbers only in class unless a provider and plan are specified.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Rate Limits</h1>
+      <div class="grid-3" style="margin-top: 34px;">
+        <div class="card"><h2>Requests per minute</h2><p>How often your app can call.</p></div>
+        <div class="card"><h2>Tokens per minute</h2><p>How much text can be processed.</p></div>
+        <div class="card"><h2>Quota</h2><p>Total allowed usage over time.</p></div>
+      </div>
+      <div class="warning-banner" style="margin-top: 38px;">Business systems need retry logic and graceful failure, not just a single API call.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Latency</h1>
+      <div class="flow" style="margin-top: 62px;">
+        <div class="flow-box blue">Send request</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Model processes</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Receive response</div>
+      </div>
+      <div class="callout" style="margin-top: 44px;">Latency is the time between request and response. It affects user experience and workflow design.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Reliability</h1>
+      <div class="grid-2 top">
+        <ul class="checklist">
+          <li>API services can fail.</li>
+          <li>Services can slow down.</li>
+          <li>Responses can change if models or settings change.</li>
+        </ul>
+        <ul class="checklist">
+          <li>Use status checks.</li>
+          <li>Plan fallbacks.</li>
+          <li>Log important assumptions.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Structured Output</h1>
+      <p>Structured output asks the model to return machine-readable data.</p>
+      <div class="code-box" style="margin-top: 34px;">{
+  "summary": "Sales increased in Q4.",
+  "risk_level": "medium",
+  "evidence": ["revenue trend", "order count"]
+}</div>
+      <div class="callout" style="margin-top: 24px;">Useful when AI output becomes part of another information system.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Tool Calling</h1>
+      <div class="flow" style="margin-top: 64px;">
+        <div class="flow-box blue">Model sees task</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Requests a tool</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">App runs tool</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Model uses result</div>
+      </div>
+      <div class="callout" style="margin-top: 42px;">The model does not magically access systems. The application decides which tools are available.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Retrieval-Augmented Generation</h1>
+      <div class="flow" style="margin-top: 64px;">
+        <div class="flow-box blue">User query</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Retrieve documents</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Add context</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Generate answer</div>
+      </div>
+      <div class="callout" style="margin-top: 42px;">RAG brings relevant external knowledge into context instead of relying only on model memory.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Fine-Tuning vs RAG</h1>
+      <table class="table">
+        <thead><tr><th>Approach</th><th>Beginner idea</th><th>Common business use</th></tr></thead>
+        <tbody>
+          <tr><td>Fine-tuning</td><td>Change model behavior through additional training</td><td>Style, format, specialized patterns</td></tr>
+          <tr><td>RAG</td><td>Provide relevant documents at request time</td><td>Internal knowledge search and document Q&A</td></tr>
+        </tbody>
+      </table>
+      <div class="callout" style="margin-top: 28px;">For many enterprise knowledge tasks, RAG is often the first concept to understand.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Local Model vs Cloud Model</h1>
+      <table class="table">
+        <thead><tr><th>Option</th><th>Strength</th><th>Trade-off</th></tr></thead>
+        <tbody>
+          <tr><td>Local model</td><td>More control over local data movement</td><td>Device limits, setup, model quality, maintenance</td></tr>
+          <tr><td>Cloud model</td><td>Convenience, capability, scaling</td><td>Credential handling, data governance, cost</td></tr>
+        </tbody>
+      </table>
+      <div class="callout" style="margin-top: 28px;">This comparison prepares for Chapter D. Local does not automatically mean safe.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Build, Buy, or Rent</h1>
+      <div class="grid-2">
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/c08_build_buy_rent_decision.png" alt="Build buy rent decision">
+        </div>
+        <table class="table small">
+          <tbody>
+            <tr><td>SaaS</td><td>Buy ready-to-use capability</td></tr>
+            <tr><td>API</td><td>Rent model capability inside your workflow</td></tr>
+            <tr><td>Local model</td><td>Run model on local or controlled infrastructure</td></tr>
+            <tr><td>Custom system</td><td>Build and maintain more yourself</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Case: Customer Service Assistant</h1>
+      <div class="grid-2 top">
+        <div class="card"><h2>SaaS chatbot</h2><p>Fast to adopt, less custom control, provider workflow.</p></div>
+        <div class="card"><h2>API-powered workflow</h2><p>More integration with internal systems, more engineering and governance.</p></div>
+      </div>
+      <div class="callout" style="margin-top: 42px;">The right choice depends on data sensitivity, workflow fit, cost, and maintenance capacity.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Case: Business Analyst Assistant</h1>
+      <div class="flow" style="margin-top: 62px;">
+        <div class="flow-box blue">Notebook</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">API explanation</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Human verification</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Report</div>
+      </div>
+      <div class="callout" style="margin-top: 42px;">This connects directly to Chapter B: AI can help explain analysis, but evidence still matters.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Case: Internal Knowledge Search</h1>
+      <div class="flow" style="margin-top: 62px;">
+        <div class="flow-box blue">Employee question</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Retrieve policy docs</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Generate answer</div><div class="arrow">&rarr;</div>
+        <div class="flow-box">Show sources</div>
+      </div>
+      <div class="callout" style="margin-top: 42px;">Governance matters: documents, access rights, and source citation must be handled carefully.</div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Notebook Demo Step 1</h1>
+      <div class="grid-2">
+        <div class="code-box">import requests
+
+url = "https://api.worldbank.org/v2/country/CHN/indicator/NY.GDP.MKTP.CD"
+params = {"format": "json", "per_page": 20}
+
+response = requests.get(url, params=params)</div>
+        <div>
+          <ul>
+            <li>Use a no-key public API.</li>
+            <li>Keep the call small and readable.</li>
+            <li>Check the status code before parsing.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Notebook Demo Step 2</h1>
+      <div class="grid-2">
+        <div>
+          <p>Convert JSON into rows and columns.</p>
+          <ul>
+            <li>year</li>
+            <li>country</li>
+            <li>indicator</li>
+            <li>value</li>
+          </ul>
+        </div>
+        <table class="table small">
+          <thead><tr><th>year</th><th>country</th><th>value</th></tr></thead>
+          <tbody>
+            <tr><td>2023</td><td>China</td><td>...</td></tr>
+            <tr><td>2022</td><td>China</td><td>...</td></tr>
+            <tr><td>2021</td><td>China</td><td>...</td></tr>
+            <tr><td>2020</td><td>China</td><td>...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Notebook Demo Step 3</h1>
+      <div class="grid-2">
+        <div class="screenshot-placeholder" data-src="../slide_assets/screenshots/c_world_bank_indicator_chart.png">
+          <div><strong>Screenshot placeholder</strong><p>c_world_bank_indicator_chart.png</p></div>
+        </div>
+        <div>
+          <p>Plot the indicator trend to validate that API data was converted correctly.</p>
+          <ul>
+            <li>Check year order.</li>
+            <li>Check missing values.</li>
+            <li>Label the chart clearly.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Notebook Demo Step 4</h1>
+      <div class="grid-2">
+        <div>
+          <p>Optional LLM API call reads credentials from environment variables.</p>
+          <ul>
+            <li>No real key in notebook.</li>
+            <li>No real key in slides.</li>
+            <li>Fallback if no key is configured.</li>
+          </ul>
+        </div>
+        <div class="screenshot-placeholder" data-src="../slide_assets/screenshots/c_env_example.png">
+          <div><strong>Screenshot placeholder</strong><p>c_env_example.png</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Credential Handling Preview</h1>
+      <div class="grid-2">
+        <div class="code-box">MODEL_API_KEY=your_key_here
+MODEL_NAME=example-model
+MODEL_BASE_URL=https://example.com/v1</div>
+        <div>
+          <ul>
+            <li>Use placeholders in examples.</li>
+            <li>Keep real secrets outside notebooks.</li>
+            <li>Chapter D will cover leakage and controls.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Cloud Benefits</h1>
+      <div class="grid-4">
+        <div class="card"><h2>Scalability</h2><p>Serve more users.</p></div>
+        <div class="card"><h2>Speed</h2><p>Use managed infrastructure quickly.</p></div>
+        <div class="card"><h2>Managed services</h2><p>Reduce local maintenance.</p></div>
+        <div class="card"><h2>Collaboration</h2><p>Shared access across locations.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Cloud Risks</h1>
+      <div class="grid-4">
+        <div class="card"><h2>Cost</h2><p>Usage can grow unexpectedly.</p></div>
+        <div class="card"><h2>Vendor dependence</h2><p>Services and prices can change.</p></div>
+        <div class="card"><h2>Data governance</h2><p>Data movement must be controlled.</p></div>
+        <div class="card"><h2>Reliability</h2><p>Outages affect dependent workflows.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Remote High-Performance Computing</h1>
+      <div class="grid-2">
+        <div>
+          <p>Remote high-performance computing provides specialized resources that ordinary student devices may not have.</p>
+          <ul>
+            <li>GPU acceleration</li>
+            <li>large memory</li>
+            <li>managed environments</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/c07_remote_gpu_compute.png" alt="Remote high performance computing">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Azure Education Context</h1>
+      <div class="card" style="margin-top: 36px;">
+        <h2>Institution-provided cloud access can support learning.</h2>
+        <p>For this course refresh, students only need the concepts: cloud service models, API calls, credentials, and remote compute. We are not requiring a cloud deployment lab.</p>
+      </div>
+      <div class="flow" style="margin-top: 48px;">
+        <div class="flow-box blue">Institution</div><div class="arrow">&rarr;</div>
+        <div class="flow-box green">Cloud learning account</div><div class="arrow">&rarr;</div>
+        <div class="flow-box orange">Student experiments</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Why No Cloud Deployment Lab?</h1>
+      <div class="grid-2 top">
+        <ul class="checklist">
+          <li>Account setup can be uneven.</li>
+          <li>Billing risk can distract from learning.</li>
+          <li>Student devices and permissions vary.</li>
+        </ul>
+        <ul class="checklist">
+          <li>The core goal is conceptual literacy.</li>
+          <li>Notebook API calls are enough for class.</li>
+          <li>Security needs a clear foundation first.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Decision Framework</h1>
+      <table class="table">
+        <thead><tr><th>Question</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td>How sensitive is the data?</td><td>Determines governance and model choice.</td></tr>
+          <tr><td>How much does speed matter?</td><td>Supports SaaS or API adoption.</td></tr>
+          <tr><td>How much control is needed?</td><td>Pushes toward API, local, or custom systems.</td></tr>
+          <tr><td>Who will maintain it?</td><td>Determines whether the solution is realistic.</td></tr>
+          <tr><td>What is the cost pattern?</td><td>Prevents surprise usage bills.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content big-question wide">
+      <h1>When should a firm use SaaS instead of API integration?</h1>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Check Your Understanding</h1>
+      <div class="grid-3">
+        <div class="card"><h2>API key</h2><p>What does it grant?</p></div>
+        <div class="card"><h2>Endpoint</h2><p>What does it identify?</p></div>
+        <div class="card"><h2>Token</h2><p>Why does it matter?</p></div>
+        <div class="card"><h2>Rate limit</h2><p>What happens if usage is too high?</p></div>
+        <div class="card"><h2>SaaS/PaaS/IaaS</h2><p>Who manages what?</p></div>
+        <div class="card"><h2>Latency</h2><p>Why does response time affect workflow?</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Key Takeaways</h1>
+      <div class="grid-3" style="margin-top: 32px;">
+        <div class="takeaway"><h2>APIs connect systems</h2><p>Request and response workflows are core to modern IS.</p></div>
+        <div class="takeaway"><h2>Cloud powers AI</h2><p>Remote compute and managed services make AI easier to use.</p></div>
+        <div class="takeaway"><h2>Keys are credentials</h2><p>They enable access and create security responsibilities.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="content">
+      <h1>Transition to the Next Lecture</h1>
+      <div class="grid-2">
+        <div>
+          <p>Next: securing data, credentials, models, and dashboards.</p>
+          <ul>
+            <li>API key exposure</li>
+            <li>data leakage</li>
+            <li>prompt injection</li>
+            <li>local model trade-offs</li>
+            <li>secure dashboard design</li>
+          </ul>
+        </div>
+        <div class="image-panel">
+          <img class="visual-img" src="../slide_assets/generated/d01_ai_security_workflow.png" alt="AI security workflow preview">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const footerText = "DOTE 2051 Business Information Systems ";
+    const slides = document.querySelectorAll(".slide");
+    slides.forEach((slide, index) => {
+      slide.id = `slide-${index + 1}`;
+      const mark = document.createElement("div");
+      mark.className = "bnbu-mark";
+      mark.setAttribute("aria-label", "BNBU");
+      mark.textContent = "BNBU";
+      slide.appendChild(mark);
+
+      const footer = document.createElement("div");
+      footer.className = "footer";
+      footer.textContent = footerText;
+      slide.appendChild(footer);
+
+      const number = document.createElement("div");
+      number.className = "slide-number";
+      number.textContent = `${index + 1} / 54`;
+      slide.appendChild(number);
+    });
+
+    const requestedSlide = Number(new URLSearchParams(window.location.search).get("slide"));
+    if (Number.isInteger(requestedSlide) && requestedSlide >= 1 && requestedSlide <= slides.length) {
+      window.addEventListener("load", () => {
+        slides[requestedSlide - 1].scrollIntoView({ block: "start" });
+      });
+    }
+
+    document.querySelectorAll(".screenshot-placeholder[data-src]").forEach((box) => {
+      const src = box.getAttribute("data-src");
+      const img = new Image();
+      img.className = "auto-screenshot";
+      img.alt = box.textContent.trim();
+      img.onload = () => {
+        box.textContent = "";
+        box.classList.remove("screenshot-placeholder");
+        box.classList.add("image-panel");
+        box.appendChild(img);
+      };
+      img.src = src;
+    });
+  </script>
+</body>
+</html>

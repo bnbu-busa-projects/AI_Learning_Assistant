@@ -1,0 +1,19 @@
+{
+  "name": "ai-learning-assistant-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Electron shell for the AI Learning Assistant Docker Desktop runtime.",
+  "main": "src/main.js",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "launch-smoke": "node scripts/launch-smoke.js",
+    "smoke": "node scripts/smoke.js",
+    "start": "electron ."
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "electron": "^42.3.2"
+  }
+}
