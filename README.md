@@ -31,7 +31,10 @@ The web interface is served by the backend at `/ui/`. The application stores met
 
 The supplied project is designed as learning software. Its built-in BNBU login is not production-grade authentication. For the public deployment in Task 3, you must therefore use HTTPS and an additional access-control layer at the reverse proxy.
 
-## Task 1: Build AI Agent on local machine (30 marks)
+## Task 1: Build AI Agent on local machine (40 marks)
+
+Local deployment and verification: **20 marks**. Improving the report-generation
+instructions and producing the assignment report: **20 marks**.
 
 ### Architecture
 
@@ -77,7 +80,25 @@ bash scripts/check-local-ui.sh --open
 
 The script checks `http://127.0.0.1:14242/ui/`, requests that your default browser open it, and saves the terminal output as `local-ui-check.txt` in the project folder.
 
-## Task 2: Build AI Agent on Aliyun ECS machine (50 marks)
+### Improve the report-generation instructions (20 marks)
+
+Revise the AI agent instructions in `backend/pipelines/essay_html.py` so the
+AI Learning Assistant generates an appropriate report for this assignment.
+Your instructions should guide the report's structure, clarity, technical
+explanations, and use of deployment evidence.
+
+Use the deployed AI Learning Assistant to create an assignment report of **no
+more than 20 pages**. The report should explain the steps you completed, how
+the deployed system works, and how it could be improved. Include screenshots
+of the working interfaces from **Tasks 1 and 2**, and **Task 3's HTTPS domain
+URL** and a screenshot showing the successful access-control check with the
+browser's address bar visible.
+
+Finalize the report after completing Tasks 2 and 3 so it includes evidence
+from all three tasks. Include your revised instructions in the source-code
+repository you submit.
+
+## Task 2: Build AI Agent on Aliyun ECS machine (40 marks)
 
 ### Architecture
 
@@ -281,19 +302,9 @@ Internet user
 
 **Submission deadline: November 1 @ 23:59.**
 
-Use the deployed AI Learning Assistant to create an assignment report of no
-more than 20 pages. The report should explain what steps, how the deployed
-system works, and how it could be improved. Include screenshots of the working
-interfaces from Tasks 1 and 2, and Task 3's HTTPS domain URL and screenshot
-showing the successful access-control check with the browser's address bar
-visible.
-
-**Optional:** You may revise `backend/pipelines/essay_html.py` to improve the
-AI agent for a specific task, such as generating your assignment report.
-
 Submit these items:
 
-1. The assignment report described above.
+1. The assignment report specified in Task 1.
 2. The link to your GitHub source-code repository, including the whole project.
 3. `local-ui-check.txt`, generated on your local machine.
 4. `ecs-docker-check.txt`, generated on your ECS server.
