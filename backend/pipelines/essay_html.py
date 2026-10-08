@@ -4,6 +4,7 @@ import json
 from typing import Any, Callable
 
 from backend.artifacts.filesystem import ArtifactRun
+from backend.pipelines.authorship import add_author_credit
 from backend.pipelines.common import (
     PipelineError,
     PipelineResult,
@@ -80,7 +81,7 @@ def run_essay_html_pipeline(
         ) from exc
 
     source = extract_fenced_or_raw(raw_output, accepted_languages={"html", "htm"})
-    source = source.strip() + "\n"
+    source = add_author_credit(source.strip()) + "\n"
     html_path = artifact_run.write_output(
         "main.html",
         source,

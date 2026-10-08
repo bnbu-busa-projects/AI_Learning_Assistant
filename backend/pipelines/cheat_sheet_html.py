@@ -4,6 +4,7 @@ import json
 from typing import Any, Callable
 
 from backend.artifacts.filesystem import ArtifactRun
+from backend.pipelines.authorship import add_author_credit
 from backend.context.extraction import UploadExtraction
 from backend.pipelines.common import (
     PipelineError,
@@ -99,7 +100,7 @@ def run_cheat_sheet_html_pipeline(
         ) from exc
 
     source = extract_fenced_or_raw(raw_output, accepted_languages={"html", "htm"})
-    source = source.strip() + "\n"
+    source = add_author_credit(source.strip()) + "\n"
     html_path = artifact_run.write_output(
         "cheat-sheet.html",
         source,

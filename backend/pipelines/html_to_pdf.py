@@ -1,8 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from io import BytesIO
 from pathlib import Path
 from typing import Protocol
+
+from pypdf import PdfWriter
+
+from backend.pipelines.authorship import ARTIFACT_AUTHOR
 
 
 @dataclass(frozen=True)
@@ -109,6 +114,7 @@ class PlaywrightPdfConverter:
                     )
                 finally:
                     browser.close()
+            _set_pdf_author(resolved_pdf)
         except PlaywrightTimeoutError as exc:
             log_text = _format_log([*log_lines, "Error: HTML-to-PDF conversion timed out."])
             raise ConvertError("HTML-to-PDF conversion timed out.", log_text=log_text) from exc
@@ -133,3 +139,13 @@ class PlaywrightPdfConverter:
 
 def _format_log(lines: list[str]) -> str:
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _set_pdf_author(pdf_path: Path) -> None:
+    # Clone the document to retain pagination and existing metadata.
+    writer = PdfWriter(clone_from=str(pdf_path))
+    writer.add_metadata({"/Author": ARTIFACT_AUTHOR})
+    buffer = BytesIO()
+    writer.write(buffer)
+    writer.close()
+    pdf_path.write_bytes(buffer.getvalue())
