@@ -40,6 +40,8 @@ export AILA_WORKSPACE_DIR="${TMP_ROOT}/workspace"
 export APP_SQLITE_PATH="/app/data/app.sqlite"
 export WORKSPACE_ROOT="/app/workspace"
 export MODEL_SECRET_FILE="/app/data/model-secrets.env"
+export MODEL_KEY_ENCRYPTION_FILE="/app/data/model-key-encryption.key"
+unset MODEL_KEY_ENCRYPTION_KEY
 export MODEL_PROVIDER="openai_compatible"
 export MODEL_BASE_URL="http://mock-provider.local/v1"
 export MODEL_NAME="mock-qwen"
@@ -189,7 +191,7 @@ assert upload["media_type"] == "text/markdown", upload
 assert upload["sha256"] == hashlib.sha256((tmp_root / "reference.md").read_bytes()).hexdigest()
 assert "stored_path" not in json.dumps(upload_response), upload_response
 assert "smoke-profile-key" not in json.dumps(profile), profile
-assert profile["api_key_ref"] == "env:MODEL_API_KEY", profile
+assert profile["api_key_ref"].startswith("user:"), profile
 assert profile_test["ok"] is True, profile_test
 assert run["status"] == "succeeded", run
 assert run["intent"] == "essay_latex", run
@@ -249,9 +251,9 @@ convert_log = convert_log_path.read_text(encoding="utf-8")
 assert "Converter: playwright_chromium" in convert_log, convert_log
 assert "Result: pdf_ok" in convert_log, convert_log
 
-secret_file = pathlib.Path(os.environ["AILA_DATA_DIR"]) / "model-secrets.env"
-assert secret_file.exists(), secret_file
-assert "smoke-profile-key" in secret_file.read_text(encoding="utf-8")
+data_dir = pathlib.Path(os.environ["AILA_DATA_DIR"])
+assert (data_dir / "model-key-encryption.key").exists()
+assert b"smoke-profile-key" not in (data_dir / "app.sqlite").read_bytes()
 
 ui_html = (tmp_root / "ui.html").read_text(encoding="utf-8")
 assert "AI Learning Assistant - Artifact Studio" in ui_html

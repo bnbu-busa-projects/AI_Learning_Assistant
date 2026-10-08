@@ -6,6 +6,20 @@ Status: Complete
 
 # Product Specification
 
+## Account Display
+
+The signed-in identity control displays the user's email address without a role
+label. It retains its logout action. Backend role and authorization behavior
+remain unchanged.
+
+## Account-Specific Model Keys
+
+Each user can save a personal model API key without changing anyone else's key.
+Personal keys are encrypted in SQLite and use a master key outside the database.
+Users without a personal key may use the developer's shared service key when
+configured. Existing shared profiles remain compatible; users must re-enter
+previously saved personal keys once to make them independent.
+
 ## Generated PDF Authorship
 
 New essay, slide, and cheat-sheet outputs include a visible author credit,

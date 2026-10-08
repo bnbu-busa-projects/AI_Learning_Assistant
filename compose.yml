@@ -13,6 +13,8 @@ services:
       MODEL_BASE_URL: ${MODEL_BASE_URL:-https://dashscope.aliyuncs.com/compatible-mode/v1}
       MODEL_NAME: ${MODEL_NAME:-qwen3.6-flash}
       MODEL_API_KEY: ${MODEL_API_KEY:-}
+      MODEL_KEY_ENCRYPTION_KEY: ${MODEL_KEY_ENCRYPTION_KEY:-}
+      MODEL_KEY_ENCRYPTION_FILE: ${MODEL_KEY_ENCRYPTION_FILE:-/app/data/model-key-encryption.key}
       MODEL_SECRET_FILE: ${MODEL_SECRET_FILE:-/app/data/model-secrets.env}
       MODEL_CONTEXT_WINDOW: ${MODEL_CONTEXT_WINDOW:-1000000}
       MODEL_SUPPORTS_STREAMING: ${MODEL_SUPPORTS_STREAMING:-true}

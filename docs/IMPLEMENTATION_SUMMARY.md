@@ -49,6 +49,16 @@ repository artifacts carry the behavior.
 | Electron desktop shell | Docker detection, backend health polling, workbench window lifecycle | `apps/desktop/src/main.js`, `apps/desktop/src/runtime.js` |
 | E2E smoke coverage | Mocked-provider end-to-end test exercising auth, settings, run creation, status events, manifest, and static serving | `scripts/smoke_e2e.sh` |
 
+## Account-Specific API Keys (2026-10-08)
+
+Personal API keys now use Fernet-encrypted SQLite storage, linked to the user.
+The master key stays outside SQLite and persists in an owner-only runtime file
+or an operator-supplied environment value. Shared developer keys remain compatible.
+Schema v5 preserves existing accounts, sessions, and profiles. See ADR 011 and
+`docs/CONTRACTS/model-settings.md`. Users must re-enter previously shared personal
+keys once to make them independent. Verification is recorded in the corresponding
+QA report under `docs/QA_REPORTS/`.
+
 ## Completed Task Ledger
 
 ### Phase-1 Implementation (2026-05-31 – 2026-06-03)

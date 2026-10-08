@@ -27,7 +27,9 @@ Read these files before implementing or reviewing:
   future replacement by stronger auth.
 - Model provider uses the OpenAI-compatible abstraction pointed at Qwen by default.
   API keys are never committed; they live in untracked `.env` or the in-app editor.
-- SQLite stores metadata; generated artifacts live on disk under `workspace/`.
+- SQLite stores metadata and encrypted personal API keys; the encryption master
+  key stays outside the database. See ADR 011. Generated artifacts live on disk
+  under `workspace/`.
 - The frontend is a conversational preview workbench with English, Simplified
   Chinese, and Traditional Chinese locale support.
 
@@ -61,7 +63,9 @@ Read these files before implementing or reviewing:
 ## Sensitive Surfaces
 
 - Auth/session behavior is isolated for replacement; changes need explicit task scope.
-- API keys and secrets are never committed. Model provider defaults include only
+- API keys and encryption master keys are never committed. Personal keys use
+  the encrypted account-specific store in `docs/CONTRACTS/model-settings.md`.
+  Model provider defaults include only
   non-secret values from `docs/CONTRACTS/model-settings.md`.
 - Filesystem writes under `workspace/` follow `docs/CONTRACTS/artifact-filesystem.md`.
 - The macOS launcher stubs `run_web.command` and `run_desktop.command` MUST NOT be

@@ -207,7 +207,6 @@ function renderConsolePane(isAuthenticated) {
                     </button>
                     <button class="identity-chip" type="button" data-action="logout">
                         <span>${escapeHtml(state.user?.email || t("app.userFallback"))}</span>
-                        <strong>${escapeHtml(state.user?.role || "")}</strong>
                     </button>
                 </div>
             </div>

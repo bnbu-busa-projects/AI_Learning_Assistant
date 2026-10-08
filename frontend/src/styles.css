@@ -188,12 +188,6 @@ button.identity-chip {
     text-overflow: ellipsis;
 }
 
-.identity-chip strong {
-    color: var(--accent-amber);
-    font: 800 10px / 1 var(--font-mono);
-    text-transform: uppercase;
-}
-
 .studio-main {
     min-height: 100vh;
 }

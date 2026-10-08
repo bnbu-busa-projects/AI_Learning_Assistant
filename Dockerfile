@@ -18,7 +18,9 @@ COPY backend/requirements.txt backend/requirements.txt
 COPY backend/requirements-dev.txt backend/requirements-dev.txt
 RUN python -m pip install --upgrade pip \
     && python -m pip install -r backend/requirements-dev.txt
-RUN python -m playwright install --with-deps chromium
+RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources \
+    && printf 'Acquire::Retries "3";\n' > /etc/apt/apt.conf.d/80-download-retries \
+    && python -m playwright install --with-deps chromium
 
 COPY backend backend
 COPY pytest.ini pytest.ini

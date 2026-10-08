@@ -10,6 +10,7 @@ EXPECTED_TABLES = {
     "users",
     "sessions",
     "model_profiles",
+    "model_secrets",
     "projects",
     "runs",
     "uploads",
@@ -282,3 +283,17 @@ def test_initialize_database_migrates_v3_projects_and_backfills_default_course(t
     assert default_course["title"] == "Just Asking"
     assert default_course["context_enabled"] == 0
     assert len([row for row in repo.list_projects_for_user("user-legacy") if row["is_default"]]) == 1
+
+
+def test_v4_migration_preserves_users_and_profiles(tmp_path):
+    repo = SQLiteRepository.from_path(tmp_path / "v4.sqlite")
+    user = repo.create_user(email="migration@bnbu.edu.cn", role="teacher", password_hash="hash")
+    profile = repo.create_model_profile(user_id=user["id"], display_name="Legacy", provider="openai_compatible", base_url="https://example.com", model="example", api_key_ref="env:MODEL_API_KEY")
+    with repo.engine.begin() as connection:
+        connection.exec_driver_sql("DROP TABLE model_secrets")
+        connection.exec_driver_sql("PRAGMA user_version=4")
+    initialize_database(repo.engine)
+    assert get_schema_version(repo.engine) == 5
+    assert repo.get_user_by_email(user["email"])["id"] == user["id"]
+    assert repo.get_model_profile(profile["id"])["api_key_ref"] == "env:MODEL_API_KEY"
+    assert not repo.has_model_secrets()

@@ -131,6 +131,21 @@ Phase 1 surfaces `projects` as lightweight course containers. The name stays `pr
 | `snippet` | text nullable | short snippet |
 | `created_at` | text not null | ISO timestamp |
 
+### `model_secrets`
+
+Added in schema version 5. Stores encrypted personal model API keys; shared server
+keys remain outside the database.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `user_id` | text primary key | references `users.id`, deletes cascade |
+| `api_key_ref` | text unique not null | opaque personal-key handle |
+| `encrypted_api_key` | text not null | Fernet ciphertext; never returned by APIs |
+| `updated_at` | text not null | ISO timestamp |
+
+The master encryption key is stored separately from SQLite, as an operator-supplied
+environment value or an owner-only runtime key file. See ADR 011 and `model-settings.md`.
+
 ## Migration Rules
 
 - Use explicit migrations once the schema exists.
@@ -151,6 +166,8 @@ Phase 1 surfaces `projects` as lightweight course containers. The name stays `pr
 ## Acceptance Checks
 
 - A new database can be created without Postgres or Mongo.
+- Schema v4 upgrades add `model_secrets` and advance to v5 without changing existing users, sessions, or profiles.
+- Personal keys are stored as ciphertext linked to the user; raw keys never appear in SQLite.
 - Users, sessions, profiles, runs, uploads, artifacts, and citations can be inserted in isolation.
 - A revision run can reference a prior run without overwriting or mutating the prior run row/folder.
 - A new user can receive one default context-disabled project/course row, ordinary courses can be archived without deleting linked runs, and runs can record their selected course via `project_id`.

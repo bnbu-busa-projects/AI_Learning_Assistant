@@ -6,6 +6,8 @@
 **/.env.*
 Qwen_API
 **/model-secrets.env
+**/model-key-encryption.key
+**/.encryption-*
 data/
 workspace/
 **/node_modules

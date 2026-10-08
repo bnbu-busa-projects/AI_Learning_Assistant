@@ -883,7 +883,7 @@ def _resolve_model_for_run(
         "provider": profile["provider"],
         "base_url": profile["base_url"],
         "model": profile["model"],
-        "api_key_ref": profile.get("api_key_ref"),
+        "api_key_ref": profile.get("api_key_ref") or MODEL_API_KEY_REF,
         "context_window_hint": profile.get("context_window_hint"),
     }
 

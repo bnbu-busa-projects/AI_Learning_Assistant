@@ -2,7 +2,14 @@
 
 In this assignment, you will deploy the supplied AI Learning Assistant as a web service on an Aliyun ECS instance. The application uses a FastAPI backend, a browser-based user interface, SQLite storage, a Qwen-compatible model API, and Docker Compose. You will first test the service through the ECS public IP and then publish it securely through a domain name.
 
-This is an individual assignment. Use only the supplied project files and your own cloud and model-service accounts.
+**Qwen API registration:**
+
+Register a new account or sign in at the [Qwen API platform](https://platform.qianwenai.com/home/), obtain your own API key, and save it securely. It can be used in two ways:
+
+1. **As a user**, enter the key in the app's model settings to use the AI features.
+2. **As a developer**, configure a key to provide AI service to your users. Create `data/model-secrets.env` in the project folder and add `MODEL_API_KEY=your_key`.
+
+Keys entered in the app are encrypted and stored in the SQLite database, linked to each user's account. Keep your API key private and do not include it in your report or GitHub repository.
 
 ## Learning outcomes
 

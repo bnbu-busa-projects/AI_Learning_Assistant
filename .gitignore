@@ -9,6 +9,8 @@ Qwen_API
 **/Qwen_API
 data/model-secrets.env
 **/model-secrets.env
+**/model-key-encryption.key
+**/.encryption-*
 
 # Local databases, uploaded files, generated runs, and reports
 data/

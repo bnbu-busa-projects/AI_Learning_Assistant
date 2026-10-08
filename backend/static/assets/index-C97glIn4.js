@@ -40,7 +40,6 @@
                     </button>
                     <button class="identity-chip" type="button" data-action="logout">
                         <span>${i(t.user?.email||n("app.userFallback"))}</span>
-                        <strong>${i(t.user?.role||"")}</strong>
                     </button>
                 </div>
             </div>

@@ -51,13 +51,16 @@ The UI and backend default-profile creation path must use these values whenever 
 
 ## Secret Handling
 
-The concrete phase-1 storage mechanism is pinned in `docs/DECISIONS/004-local-secret-storage.md`. Summary:
+The storage design is documented in ADR 011 (`docs/DECISIONS/011-account-specific-model-keys.md`).
 
-- Tracked files may contain placeholder defaults but never real API keys.
-- Development credentials belong in `.env`, `.env.local`, or another untracked local settings file.
-- The actual secret lives in an untracked local secret store (file or environment), not in SQLite. The `model_profiles.api_key_ref` column holds only a key name/handle into that store, never the raw key or a recoverable ciphertext.
-- A request may submit a raw API key; the backend resolves it into the secret store and persists only the `api_key_ref`. No endpoint echoes the raw key back.
-- Logs must redact API keys and `Authorization` headers.
+- Personal keys submitted through the app are encrypted with Fernet authenticated encryption in SQLite's `model_secrets` table, linked to the authenticated user. `model_profiles.api_key_ref` contains only an opaque `user:<hash>` reference. API responses never return keys or ciphertext.
+- The encryption master key is outside SQLite. Operators may set `MODEL_KEY_ENCRYPTION_KEY` to a Fernet key or configure `MODEL_KEY_ENCRYPTION_FILE`. By default, the app creates an owner-only `model-key-encryption.key` file beside the database on the first personal-key save. The file persists in the mounted data directory. Back up the master key securely and separately from the database; losing it prevents decryption. It must never be committed or bundled into an image.
+- The shared developer key remains `MODEL_API_KEY` in the environment or `MODEL_SECRET_FILE`. Personal keys take priority. Shared environment values take priority over the shared file only.
+- Saving settings without a new key preserves the existing personal reference. Accounts without a personal reference can use a shared developer key, including a key configured after their profile was saved.
+- Connection tests with edited model settings use the saved personal key unless an unsaved test key is submitted. Unsaved test keys are not persisted.
+- Missing or invalid encryption storage returns a sanitized `secret_storage_unavailable` error; the backend does not silently switch personal profiles to the developer key or generate a replacement master key over existing encrypted records.
+- Existing `env:MODEL_API_KEY` references remain shared. Previously overwritten personal keys cannot be recovered; users must save their own key again to obtain an independent reference.
+- Tracked files and logs never contain raw keys or authorization tokens. Raw secrets are not returned by any endpoint.
 
 ## Environment Inputs
 
@@ -67,7 +70,10 @@ Supported local development variables:
 MODEL_PROVIDER=openai_compatible
 MODEL_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
 MODEL_NAME=qwen3.6-flash
-MODEL_API_KEY=<secret>
+MODEL_API_KEY=<shared service secret>
+MODEL_SECRET_FILE=/app/data/model-secrets.env
+MODEL_KEY_ENCRYPTION_FILE=/app/data/model-key-encryption.key
+MODEL_KEY_ENCRYPTION_KEY=<optional Fernet master key>
 MODEL_CONTEXT_WINDOW=1000000
 MODEL_SUPPORTS_STREAMING=true
 ```
@@ -104,6 +110,7 @@ Uses the canonical envelope (`errors.md`). Failure cases:
 | Scenario | HTTP | Code |
 | --- | --- | --- |
 | Save profile with malformed `base_url`/missing `model` | 400 | `validation_error` |
+| Encryption storage missing, invalid, or unable to decrypt | 500 | `secret_storage_unavailable` |
 | `test` with no resolvable key | 400 | `missing_api_key` |
 | `test` where provider rejects the key | 502 | `provider_auth_failed` |
 | `test` where provider/network is unreachable | 502 | `provider_unavailable` |
@@ -112,7 +119,7 @@ Uses the canonical envelope (`errors.md`). Failure cases:
 
 - `base_url` must be an absolute `https`/`http` URL; `model` must be non-empty.
 - Empty model/base URL fields in the settings editor should reset to the documented non-secret defaults rather than saving blank values.
-- Exactly one profile may have `is_default = true`.
+- Exactly one profile per user may have `is_default = true`.
 - The `test` endpoint performs a single minimal completion/models call and must time out quickly.
 
 ## Compatibility
@@ -127,6 +134,8 @@ Uses the canonical envelope (`errors.md`). Failure cases:
 ## Acceptance Checks
 
 - A user can set base URL, model, and API key.
+- Two accounts can independently save and replace personal keys, even when a shared environment key is configured. Generation and connectivity tests resolve each owner's key. SQLite contains ciphertext only; replacing a key does not affect other accounts.
+- Schema v4 upgrades to v5 while retaining accounts, sessions, and model profiles.
 - A new user sees non-secret defaults for provider, base URL, model, context window, and streaming support before entering an API key.
 - The API key is not returned by any settings endpoint.
 - A missing key gives a clear `missing_api_key` error.

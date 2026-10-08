@@ -96,6 +96,7 @@ Domain codes (used in API responses and/or `runs.error_message` / status events)
 | Code | Typical HTTP | Meaning |
 | --- | --- | --- |
 | `unknown_email_domain` | 400 | Email is not `@bnbu.edu.cn` |
+| `secret_storage_unavailable` | 500 | API-key encryption storage missing, invalid, or unable to decrypt; restore the server encryption key |
 | `missing_api_key` | 400 | No model API key configured for the selected profile |
 | `provider_auth_failed` | 502 | Provider rejected credentials |
 | `provider_unavailable` | 502 | Provider/network call failed |

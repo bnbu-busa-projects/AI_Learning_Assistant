@@ -39,7 +39,10 @@ def test_openai_compatible_provider(profile: dict[str, Any], api_key: str) -> di
 class OpenAICompatibleTextProvider:
     def generate_text(self, request: TextGenerationRequest) -> str:
         profile = request.profile
-        api_key = resolve_api_key(profile.get("api_key_ref"))
+        try:
+            api_key = resolve_api_key(profile.get("api_key_ref"))
+        except SettingsError as exc:
+            raise ModelProviderError(exc.code, exc.message) from None
         if not api_key:
             raise ModelProviderError(
                 "missing_api_key",

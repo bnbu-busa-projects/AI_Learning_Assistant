@@ -20,8 +20,9 @@ from sqlalchemy import (
     update,
 )
 from sqlalchemy.engine import Engine
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
 SQLITE_PATH_ENV = "APP_SQLITE_PATH"
 DEFAULT_SQLITE_PATH = Path("data/app.sqlite")
 
@@ -65,6 +66,15 @@ model_profiles = Table(
     Column("updated_at", Text, nullable=False),
     CheckConstraint("supports_streaming in (0, 1)", name="model_profiles_streaming_check"),
     CheckConstraint("is_default in (0, 1)", name="model_profiles_default_check"),
+)
+
+model_secrets = Table(
+    "model_secrets",
+    metadata,
+    Column("user_id", Text, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
+    Column("api_key_ref", Text, nullable=False, unique=True),
+    Column("encrypted_api_key", Text, nullable=False),
+    Column("updated_at", Text, nullable=False),
 )
 
 projects = Table(
@@ -205,6 +215,11 @@ def initialize_database(engine: Engine) -> None:
             _migrate_3_to_4(connection)
             connection.exec_driver_sql("PRAGMA user_version = 4")
 
+    if current_version < 5:
+        # metadata.create_all above adds model_secrets; existing rows are retained.
+        with engine.begin() as connection:
+            connection.exec_driver_sql("PRAGMA user_version = 5")
+
 
 def _migrate_1_to_2(connection: Any) -> None:
     columns = {
@@ -340,6 +355,30 @@ class SQLiteRepository:
         with self.engine.connect() as connection:
             row = connection.execute(select(table).where(table.c.id == row_id)).first()
             return _row_to_dict(row)
+
+    def save_model_secret(self, *, user_id: str, api_key_ref: str, encrypted_api_key: str) -> None:
+        statement = sqlite_insert(model_secrets).values(
+            user_id=user_id, api_key_ref=api_key_ref,
+            encrypted_api_key=encrypted_api_key, updated_at=_now(),
+        )
+        statement = statement.on_conflict_do_update(
+            index_elements=[model_secrets.c.user_id],
+            set_={"api_key_ref": statement.excluded.api_key_ref,
+                  "encrypted_api_key": statement.excluded.encrypted_api_key,
+                  "updated_at": statement.excluded.updated_at},
+        )
+        with self.engine.begin() as connection:
+            connection.execute(statement)
+
+    def get_model_secret(self, api_key_ref: str) -> dict[str, Any] | None:
+        with self.engine.connect() as connection:
+            return _row_to_dict(connection.execute(
+                select(model_secrets).where(model_secrets.c.api_key_ref == api_key_ref)
+            ).first())
+
+    def has_model_secrets(self) -> bool:
+        with self.engine.connect() as connection:
+            return connection.execute(select(model_secrets.c.user_id).limit(1)).first() is not None
 
     def create_user(
         self,

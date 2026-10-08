@@ -133,7 +133,7 @@ The frontend rebuild boundary is intentionally asymmetric:
 - Web UI must not execute generated JavaScript, notebooks, shell commands, or arbitrary HTML in the main renderer. Any future execution feature needs a sandbox contract and a new task.
 - Frontend appearance tasks may freely replace frontend implementation details, but must not require backend code changes to pass.
 - Backend owns SQLite, filesystem artifacts, model provider calls, web search, and HTML-to-PDF conversion.
-- SQLite stores metadata only. Large uploads, generated source, notebooks, PDFs, logs, and manifests stay on disk.
+- SQLite stores metadata and encrypted personal model keys; the encryption master key lives outside SQLite. Large uploads, generated source, notebooks, PDFs, logs, and manifests stay on disk.
 - Model provider code must depend on an abstract provider profile, not hard-coded Bianxie/OpenAI/Qwen constants.
 - Pipeline code may call context builder, artifact writer, and model provider; it must not know Electron internals.
 - Context Builder may read uploads through the storage/filesystem layer; it must not generate final artifacts.
@@ -169,7 +169,7 @@ Future runtimes must preserve the same contracts:
 - Failure handling: web-search and PDF-conversion failures are non-fatal unless the user forced the behavior; failures are recorded in run metadata and `manifest.json` with a sanitized message. `.html` source is always preserved even when PDF conversion fails.
 - Performance: run-stage timing must be measured before optimization work. If the external model provider accounts for more than half of live run wall time, local optimization should stop at reporting and small obvious fixes unless a separate local bottleneck is demonstrated.
 - Backups/migrations: SQLite uses explicit, forward-only schema migrations with a `schema_version`; the database file and `workspace/` are the two artifacts a user must back up. Both must survive container/app restarts.
-- Security: weak BNBU institutional email auth is local/teaching only and isolated behind middleware so stronger auth can replace it; tokens are opaque to clients; secret storage follows `docs/DECISIONS/004-local-secret-storage.md`.
+- Security: weak BNBU institutional email auth is local/teaching only and isolated behind middleware so stronger auth can replace it; tokens are opaque to clients; personal-key storage follows `docs/DECISIONS/011-account-specific-model-keys.md`.
 - Launcher hygiene: the macOS launchers at the project root are stub-plus-script: `run_web.command` and `run_desktop.command` are stable stubs and `scripts/launcher-web.sh` and `scripts/launcher-desktop.sh` hold the real logic. The stubs must not be rewritten by Cursor or any other GUI app; if they are, `AppleSystemPolicy` will SIGKILL the script on Finder double-click and `scripts/bless-launchers.sh` must be re-run from the human's Terminal.app. See `docs/DECISIONS/008-launcher-stub-split.md` and `.cursor/rules/launcher-stability.mdc`.
 
 ## Development History
@@ -205,5 +205,5 @@ Rejected alternatives:
 
 - Future edits to the default Qwen model id, base URL, or context hint must be verified against current official documentation before implementation. The phase-1 default endpoint targets China (Beijing) DashScope because the human-confirmed release API key belongs to the China site.
 - Concrete web-search provider and its rate/cost limits are undecided; the adapter boundary lets the choice land later.
-- Whether SQLite secret columns should be encrypted at rest in phase 1 or deferred to an OS keychain in a later phase (see `docs/DECISIONS/004-local-secret-storage.md`).
+- Personal model keys use encrypted SQLite storage as specified in ADR 011; future master-key rotation or OS keychain integration must preserve account isolation.
 - Background execution model for runs (in-process tasks vs a worker) may evolve; the status event contract must stay stable regardless.

@@ -1,8 +1,10 @@
+from pathlib import Path
+
 import pytest
 
 from backend.api.auth import get_auth_repository
 from backend.api.settings import get_provider_tester, get_settings_repository
-from backend.core.model_settings import default_profile_values
+from backend.core.model_settings import default_profile_values, resolve_api_key
 from backend.main import app
 from backend.storage.sqlite import SQLiteRepository
 
@@ -15,6 +17,10 @@ def settings_client(client, tmp_path, monkeypatch):
     repo = SQLiteRepository.from_path(tmp_path / "settings.sqlite")
     secret_file = tmp_path / "local-secrets.env"
     monkeypatch.setenv("MODEL_SECRET_FILE", str(secret_file))
+    monkeypatch.setenv("APP_SQLITE_PATH", str(tmp_path / "settings.sqlite"))
+    monkeypatch.setenv("MODEL_KEY_ENCRYPTION_FILE", str(tmp_path / "model-key-encryption.key"))
+    monkeypatch.delenv("MODEL_KEY_ENCRYPTION_KEY", raising=False)
+    monkeypatch.delenv("MODEL_API_KEY", raising=False)
     app.dependency_overrides[get_auth_repository] = lambda: repo
     app.dependency_overrides[get_settings_repository] = lambda: repo
 
@@ -61,8 +67,12 @@ def test_create_update_and_list_default_model_profile_redacts_secret(settings_cl
 
     assert create.status_code == 200
     assert raw_key not in create.text
-    assert create.json()["api_key_ref"] == "env:MODEL_API_KEY"
-    assert raw_key in secret_file.read_text(encoding="utf-8")
+    assert create.json()["api_key_ref"].startswith("user:")
+    assert not secret_file.exists()
+    assert resolve_api_key(create.json()["api_key_ref"], repo=_repo) == raw_key
+    stored = _repo.get_model_secret(create.json()["api_key_ref"])
+    assert raw_key not in stored["encrypted_api_key"]
+    assert raw_key.encode() not in Path(_repo.engine.url.database).read_bytes()
 
     update = client.put(
         "/api/settings/model-profiles/default",
@@ -165,3 +175,41 @@ def test_malformed_profile_uses_validation_envelope(settings_client):
     assert body["error"]["code"] == "validation_error"
     assert {"field": "base_url", "rule": "absolute_http_url"} in body["error"]["fields"]
     assert {"field": "model", "rule": "required"} in body["error"]["fields"]
+
+
+def test_multiple_accounts_save_and_test_independent_keys(settings_client):
+    client, repo, first_headers, _ = settings_client
+    registered = client.post("/api/auth/register", json={"email": "second@bnbu.edu.cn", "password": "correct-horse", "confirm_password": "correct-horse"})
+    assert registered.status_code == 200
+    logged_in = client.post("/api/auth/login", json={"email": "second@bnbu.edu.cn", "password": "correct-horse"})
+    second_headers = {"Authorization": "Bearer " + logged_in.json()["token"]}
+    payload = {"base_url": DEFAULT_QWEN_BASE_URL, "model": "qwen3.6-flash"}
+    first = client.put("/api/settings/model-profiles/default", headers=first_headers, json={**payload, "api_key": "test-personal-a"})
+    second = client.put("/api/settings/model-profiles/default", headers=second_headers, json={**payload, "api_key": "test-personal-b"})
+    assert first.status_code == second.status_code == 200
+    assert first.json()["api_key_ref"] != second.json()["api_key_ref"]
+    for headers, expected in [(first_headers, "test-personal-a"), (second_headers, "test-personal-b")]:
+        received = []
+        def tester(profile, api_key):
+            received.append(api_key)
+            return {"ok": True, "model": profile["model"]}
+        app.dependency_overrides[get_provider_tester] = lambda: tester
+        tested = client.post("/api/settings/model-profiles/test", headers=headers, json={})
+        assert tested.status_code == 200
+        assert received == [expected]
+        listed = client.get("/api/settings/model-profiles", headers=headers)
+        assert len(listed.json()) == 1
+        assert expected not in tested.text + listed.text
+    saved = client.put("/api/settings/model-profiles/default", headers=first_headers, json=payload)
+    assert saved.json()["api_key_ref"] == first.json()["api_key_ref"]
+
+
+def test_encryption_errors_use_safe_api_envelope(settings_client, monkeypatch):
+    client, repo, headers, _ = settings_client
+    monkeypatch.setenv("MODEL_KEY_ENCRYPTION_KEY", "invalid-encryption-config")
+    response = client.put("/api/settings/model-profiles/default", headers=headers, json={"base_url": DEFAULT_QWEN_BASE_URL, "model": "qwen3.6-flash", "api_key": "private-key-to-hide"})
+    assert response.status_code == 500
+    assert response.json()["error"]["code"] == "secret_storage_unavailable"
+    assert "private-key-to-hide" not in response.text
+    assert "invalid-encryption-config" not in response.text
+    assert not repo.has_model_secrets()
